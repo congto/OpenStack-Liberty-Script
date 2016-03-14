@@ -188,6 +188,11 @@ ops_edit_file $netmetadata DEFAULT nova_metadata_ip $CON_MGNT_IP
 ops_edit_file $netmetadata DEFAULT metadata_proxy_shared_secret $METADATA_SECRET
 ops_edit_file $netmetadata DEFAULT verbose True
 
+ops_del $netmetadata DEFAULT admin_tenant_name
+ops_del $netmetadata DEFAULT admin_user
+ops_del $netmetadata DEFAULT admin_password
+
+
 
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
