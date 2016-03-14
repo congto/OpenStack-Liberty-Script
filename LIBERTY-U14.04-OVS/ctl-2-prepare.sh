@@ -2,7 +2,18 @@
 #
 source config.cfg
 
-echo "Install python client"
+function echocolor() { # $1 = string
+    COLOR='\033[01;93m'
+    NC='\033[0m'
+    printf "${COLOR}$1${NC}\n"
+}
+
+echocolor "Cai dat goi CRUDINI"
+sleep 3
+apt-get -y install python-pip
+pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
+
+echocolor "Install python client"
 apt-get -y install python-openstackclient
 sleep 5
 
