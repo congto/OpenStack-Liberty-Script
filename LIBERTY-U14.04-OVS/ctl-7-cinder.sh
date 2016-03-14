@@ -39,71 +39,55 @@ volumev2
 #
 echocolor "########## Install CINDER ##########"
 sleep 3
-apt-get install -y cinder-api cinder-scheduler python-cinderclient lvm2 cinder-volume python-mysqldb  qemu 
+apt-get install -y cinder-api cinder-scheduler python-cinderclient \
+	lvm2 cinder-volume python-mysqldb  qemu 
 
 
 pvcreate /dev/vdb
 vgcreate cinder-volumes /dev/vdb
-sed  -r -i 's#(filter = )(\[ "a/\.\*/" \])#\1["a\/vdb\/", "r/\.\*\/"]#g' /etc/lvm/lvm.conf
+sed  -r -i 's#(filter = )(\[ "a/\.\*/" \])#\1["a\/vdb\/", "r/\.\*\/"]#g' \
+	/etc/lvm/lvm.conf
 
-filecinder=/etc/cinder/cinder.conf
-test -f $filecinder.orig || cp $filecinder $filecinder.orig
-rm $filecinder
-cat << EOF > $filecinder
+cinder_ctl=/etc/cinder/cinder.conf
+test -f $cinder_ctl.orig || cp $cinder_ctl $cinder_ctl.orig
 
-[DEFAULT]
-rootwrap_config = /etc/cinder/rootwrap.conf
-api_paste_confg = /etc/cinder/api-paste.ini
-iscsi_helper = tgtadm
-volume_name_template = volume-%s
-volume_group = cinder-volumes
-verbose = True
-auth_strategy = keystone
-state_path = /var/lib/cinder
-lock_path = /var/lock/cinder
-volumes_dir = /var/lib/cinder/volumes
+## [DEFAULT] section
+ops_edit_file $cinder_ctl DEFAULT rpc_backend rabbit
+ops_edit_file $cinder_ctl DEFAULT auth_strategy keystone
+ops_edit_file $cinder_ctl DEFAULT my_ip $CON_MGNT_IP
+ops_edit_file $cinder_ctl DEFAULT verbose True
+ops_edit_file $cinder_ctl DEFAULT enabled_backends lvm
+ops_edit_file $cinder_ctl DEFAULT glance_host $CON_MGNT_IP
+ops_edit_file $cinder_ctl DEFAULT notification_driver messagingv2
 
-rpc_backend = rabbit
-my_ip = $CON_MGNT_IP
+## [database] section
+ops_edit_file $cinder_ctl \
+connection mysql+pymysql://cinder:$CINDER_DBPASS@$CON_MGNT_IP/cinder
 
-enabled_backends = lvm
+## [oslo_messaging_rabbit] section
+ops_edit_file $cinder_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit_file $cinder_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_edit_file $cinder_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
-glance_host = $CON_MGNT_IP
+## [keystone_authtoken] section
+ops_edit_file $cinder_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:50000
+ops_edit_file $cinder_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit_file $cinder_ctl keystone_authtoken auth_plugin password
+ops_edit_file $cinder_ctl keystone_authtoken project_domain_id default
+ops_edit_file $cinder_ctl keystone_authtoken user_domain_id default
+ops_edit_file $cinder_ctl keystone_authtoken project_name service
+ops_edit_file $cinder_ctl keystone_authtoken username cinder
+ops_edit_file $cinder_ctl keystone_authtoken password $CINDER_PASS
 
-notification_driver = messagingv2
+## [oslo_concurrency] section
+ops_edit_file $cinder_ctl oslo_concurrency lock_path /var/lib/cinder/tmp
 
-[database]
-connection = mysql+pymysql://cinder:$CINDER_DBPASS@$CON_MGNT_IP/cinder
-
-[oslo_messaging_rabbit]
-rabbit_host = $CON_MGNT_IP
-rabbit_userid = openstack
-rabbit_password = $RABBIT_PASS
-
-[keystone_authtoken]
-auth_uri = http://$CON_MGNT_IP:5000
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-project_name = service
-username = cinder
-password = $CINDER_PASS
-
-[oslo_concurrency]
-lock_path = /var/lib/cinder/tmp
-
-[cinder]
-os_region_name = RegionOne
-
-[lvm]
-volume_driver = cinder.volume.drivers.lvm.LVMVolumeDriver
-volume_group = cinder-volumes
-iscsi_protocol = iscsi
-iscsi_helper = tgtadm
-
-EOF
-
+## [lvm] section
+ops_edit_file $cinder_ctl lvm \
+volume_driver cinder.volume.drivers.lvm.LVMVolumeDriver
+ops_edit_file $cinder_ctl lvm volume_group cinder-volumes
+ops_edit_file $cinder_ctl lvm iscsi_protocol iscsi
+ops_edit_file $cinder_ctl lvm iscsi_helper tgtadm
 
 
 echocolor "########## Syncing Cinder DB ##########"

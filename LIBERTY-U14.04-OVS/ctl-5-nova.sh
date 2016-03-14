@@ -97,6 +97,10 @@ ops_edit_file $nova_ctl neutron password $NEUTRON_PASS
 ops_edit_file $nova_ctl neutron service_metadata_proxy True
 ops_edit_file $nova_ctl neutron metadata_proxy_shared_secret $METADATA_SECRET
 
+## [cinder] Section 
+ops_edit_file $nova_ctl cinder os_region_name RegionOne
+
+
 echocolor "########## Remove Nova default db ##########"
 sleep 7
 rm /var/lib/nova/nova.sqlite
