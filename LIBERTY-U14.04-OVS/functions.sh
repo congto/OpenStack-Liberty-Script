@@ -1,11 +1,10 @@
 #!/bin/bash -ex
 
 # Ham dinh nghia mau cho cac ban tin in ra man hinh
-function echocolor() { # $1 = string
-    COLOR='\033[01;93m'
-    NC='\033[0m'
-    echo "${COLOR}$1${NC}\n"
+function echocolor() {
+echo "$(tput setaf 3) $1 $(tput sgr0)"
 }
+
 
 # Ham sua file cau hinh cua OpenStack
 
