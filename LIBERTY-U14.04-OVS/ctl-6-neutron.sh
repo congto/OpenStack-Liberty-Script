@@ -56,29 +56,29 @@ neutron_ctl=/etc/neutron/neutron.conf
 test -f $neutron_ctl.orig || cp $neutron_ctl $neutron_ctl.orig
 
 ## [DEFAULT] section
-ops_edit_file $neutron_ctl DEFAULT core_plugin ml2
-ops_edit_file $neutron_ctl DEFAULT service_plugins router
-ops_edit_file $neutron_ctl DEFAULT allow_overlapping_ips True
-ops_edit_file $neutron_ctl DEFAULT rpc_backend rabbit
-ops_edit_file $neutron_ctl DEFAULT notify_nova_on_port_status_changes True
-ops_edit_file $neutron_ctl DEFAULT notify_nova_on_port_data_changes True
-ops_edit_file $neutron_ctl DEFAULT nova_url http://$CON_MGNT_IP:8774/v2
-ops_edit_file $neutron_ctl DEFAULT verbose True
+ops_edit $neutron_ctl DEFAULT core_plugin ml2
+ops_edit $neutron_ctl DEFAULT service_plugins router
+ops_edit $neutron_ctl DEFAULT allow_overlapping_ips True
+ops_edit $neutron_ctl DEFAULT rpc_backend rabbit
+ops_edit $neutron_ctl DEFAULT notify_nova_on_port_status_changes True
+ops_edit $neutron_ctl DEFAULT notify_nova_on_port_data_changes True
+ops_edit $neutron_ctl DEFAULT nova_url http://$CON_MGNT_IP:8774/v2
+ops_edit $neutron_ctl DEFAULT verbose True
 
 ## [database] section
-ops_edit_file $neutron_ctl database \
+ops_edit $neutron_ctl database \
 connection mysql+pymysql://neutron:$NEUTRON_DBPASS@$CON_MGNT_IP/neutron
 
 
 ## [keystone_authtoken] section
-ops_edit_file $neutron_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
-ops_edit_file $neutron_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $neutron_ctl keystone_authtoken auth_plugin password
-ops_edit_file $neutron_ctl keystone_authtoken project_domain_id default
-ops_edit_file $neutron_ctl keystone_authtoken user_domain_id default
-ops_edit_file $neutron_ctl keystone_authtoken project_name service
-ops_edit_file $neutron_ctl keystone_authtoken username neutron
-ops_edit_file $neutron_ctl keystone_authtoken password $NEUTRON_PASS
+ops_edit $neutron_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
+ops_edit $neutron_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $neutron_ctl keystone_authtoken auth_plugin password
+ops_edit $neutron_ctl keystone_authtoken project_domain_id default
+ops_edit $neutron_ctl keystone_authtoken user_domain_id default
+ops_edit $neutron_ctl keystone_authtoken project_name service
+ops_edit $neutron_ctl keystone_authtoken username neutron
+ops_edit $neutron_ctl keystone_authtoken password $NEUTRON_PASS
 
 ops_del $neutron_ctl keystone_authtoken identity_uri
 ops_del $neutron_ctl keystone_authtoken admin_tenant_name
@@ -87,19 +87,19 @@ ops_del $neutron_ctl keystone_authtoken admin_password
 
 
 ## [oslo_messaging_rabbit] section
-ops_edit_file $neutron_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
-ops_edit_file $neutron_ctl oslo_messaging_rabbit rabbit_userid openstack
-ops_edit_file $neutron_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+ops_edit $neutron_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit $neutron_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_edit $neutron_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 ## [nova] section
-ops_edit_file $neutron_ctl nova auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $neutron_ctl nova auth_plugin password
-ops_edit_file $neutron_ctl nova project_domain_id default
-ops_edit_file $neutron_ctl nova user_domain_id default
-ops_edit_file $neutron_ctl nova region_name RegionOne
-ops_edit_file $neutron_ctl nova project_name service
-ops_edit_file $neutron_ctl nova username nova
-ops_edit_file $neutron_ctl nova password $NOVA_PASS
+ops_edit $neutron_ctl nova auth_url http://$CON_MGNT_IP:35357
+ops_edit $neutron_ctl nova auth_plugin password
+ops_edit $neutron_ctl nova project_domain_id default
+ops_edit $neutron_ctl nova user_domain_id default
+ops_edit $neutron_ctl nova region_name RegionOne
+ops_edit $neutron_ctl nova project_name service
+ops_edit $neutron_ctl nova username nova
+ops_edit $neutron_ctl nova password $NOVA_PASS
 
 ######## Backup configuration of ML2 ##################"
 echocolor "########## Configuring ML2 ##########"
@@ -109,31 +109,31 @@ ml2_clt=/etc/neutron/plugins/ml2/ml2_conf.ini
 test -f $ml2_clt.orig || cp $ml2_clt $ml2_clt.orig
 
 ## [ml2] section
-ops_edit_file $ml2_clt ml2 type_drivers flat,vlan,vxlan,gre
-ops_edit_file $ml2_clt ml2 tenant_network_types gre
-ops_edit_file $ml2_clt ml2 mechanism_drivers openvswitch
+ops_edit $ml2_clt ml2 type_drivers flat,vlan,vxlan,gre
+ops_edit $ml2_clt ml2 tenant_network_types gre
+ops_edit $ml2_clt ml2 mechanism_drivers openvswitch
 
 
 ## [ml2_type_flat] section
-ops_edit_file $ml2_clt ml2_type_flat flat_networks external
+ops_edit $ml2_clt ml2_type_flat flat_networks external
 
 ## [ml2_type_gre] section
-ops_edit_file $ml2_clt ml2_type_gre tunnel_id_ranges 1:1000
+ops_edit $ml2_clt ml2_type_gre tunnel_id_ranges 1:1000
 
 ## [securitygroup] section
-ops_edit_file $ml2_clt securitygroup enable_security_group True
-ops_edit_file $ml2_clt securitygroup enable_ipset True
+ops_edit $ml2_clt securitygroup enable_security_group True
+ops_edit $ml2_clt securitygroup enable_ipset True
 
-ops_edit_file $ml2_clt securitygroup \
+ops_edit $ml2_clt securitygroup \
 firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
 ## [ovs] section
-ops_edit_file $ml2_clt ovs local_ip $CON_MGNT_IP
-ops_edit_file $ml2_clt ovs bridge_mappings external:br-ex
+ops_edit $ml2_clt ovs local_ip $CON_MGNT_IP
+ops_edit $ml2_clt ovs bridge_mappings external:br-ex
 
 ## [agent] section
-ops_edit_file $ml2_clt agent tunnel_types gre
-ops_edit_file $ml2_clt agent prevent_arp_spoofing True
+ops_edit $ml2_clt agent tunnel_types gre
+ops_edit $ml2_clt agent prevent_arp_spoofing True
 
 
 echocolor "############ Configuring L3 AGENT ############"
@@ -143,10 +143,10 @@ netl3agent=/etc/neutron/l3_agent.ini
 test -f $netl3agent.orig || cp $netl3agent $netl3agent.orig
 
 ## [DEFAULT] section 
-ops_edit_file $netl3agent DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
-ops_edit_file $netl3agent DEFAULT external_network_bridge 
-ops_edit_file $netl3agent DEFAULT router_delete_namespaces True
-ops_edit_file $netl3agent DEFAULT verbose True
+ops_edit $netl3agent DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
+ops_edit $netl3agent DEFAULT external_network_bridge 
+ops_edit $netl3agent DEFAULT router_delete_namespaces True
+ops_edit $netl3agent DEFAULT verbose True
 
 
 echocolor "############  Configuring DHCP AGENT ############ "
@@ -156,11 +156,11 @@ netdhcp=/etc/neutron/dhcp_agent.ini
 test -f $netdhcp.orig || cp $netdhcp $netdhcp.orig
 
 ## [DEFAULT] section 
-ops_edit_file $netdhcp DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
-ops_edit_file $netdhcp DEFAULT dhcp_driver neutron.agent.linux.dhcp.Dnsmasq
-ops_edit_file $netdhcp DEFAULT dhcp_delete_namespaces True
-ops_edit_file $netdhcp DEFAULT verbose True
-ops_edit_file $netdhcp DEFAULT dnsmasq_config_file /etc/neutron/dnsmasq-neutron.conf
+ops_edit $netdhcp DEFAULT interface_driver neutron.agent.linux.interface.OVSInterfaceDriver
+ops_edit $netdhcp DEFAULT dhcp_driver neutron.agent.linux.dhcp.Dnsmasq
+ops_edit $netdhcp DEFAULT dhcp_delete_namespaces True
+ops_edit $netdhcp DEFAULT verbose True
+ops_edit $netdhcp DEFAULT dnsmasq_config_file /etc/neutron/dnsmasq-neutron.conf
 
 
 echocolor "############ Fix loi MTU ############"
@@ -175,18 +175,18 @@ netmetadata=/etc/neutron/metadata_agent.ini
 test -f $netmetadata.orig || cp $netmetadata $netmetadata.orig
 
 ## [DEFAULT] 
-ops_edit_file $netmetadata DEFAULT auth_uri http://$CON_MGNT_IP:5000
-ops_edit_file $netmetadata DEFAULT auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $netmetadata DEFAULT auth_region RegionOne
-ops_edit_file $netmetadata DEFAULT auth_plugin password
-ops_edit_file $netmetadata DEFAULT project_domain_id default
-ops_edit_file $netmetadata DEFAULT user_domain_id default
-ops_edit_file $netmetadata DEFAULT project_name service
-ops_edit_file $netmetadata DEFAULT username neutron
-ops_edit_file $netmetadata DEFAULT password $NEUTRON_PASS
-ops_edit_file $netmetadata DEFAULT nova_metadata_ip $CON_MGNT_IP
-ops_edit_file $netmetadata DEFAULT metadata_proxy_shared_secret $METADATA_SECRET
-ops_edit_file $netmetadata DEFAULT verbose True
+ops_edit $netmetadata DEFAULT auth_uri http://$CON_MGNT_IP:5000
+ops_edit $netmetadata DEFAULT auth_url http://$CON_MGNT_IP:35357
+ops_edit $netmetadata DEFAULT auth_region RegionOne
+ops_edit $netmetadata DEFAULT auth_plugin password
+ops_edit $netmetadata DEFAULT project_domain_id default
+ops_edit $netmetadata DEFAULT user_domain_id default
+ops_edit $netmetadata DEFAULT project_name service
+ops_edit $netmetadata DEFAULT username neutron
+ops_edit $netmetadata DEFAULT password $NEUTRON_PASS
+ops_edit $netmetadata DEFAULT nova_metadata_ip $CON_MGNT_IP
+ops_edit $netmetadata DEFAULT metadata_proxy_shared_secret $METADATA_SECRET
+ops_edit $netmetadata DEFAULT verbose True
 
 ops_del $netmetadata DEFAULT admin_tenant_name
 ops_del $netmetadata DEFAULT admin_user

@@ -1,9 +1,10 @@
 #!/bin/bash -ex
 
 source config.cfg
+source functions.sh
 
 sleep 3
-echo "#### Update for Ubuntu #####"
+echo "Update for Ubuntu"
 
 apt-get install software-properties-common -y
 add-apt-repository cloud-archive:liberty -y
@@ -12,7 +13,7 @@ sleep 3
 echo "##### update for Ubuntu #####"
 apt-get update -y && apt-get upgrade -y && apt-get dist-upgrade -y
 
-echo "##### Configuring hostname for COMPUTE1 node... #####"
+echocolor "Configuring hostname for COMPUTE1 node"
 sleep 3
 echo "compute1" > /etc/hostname
 hostname -F /etc/hostname
@@ -29,7 +30,7 @@ $COM1_MGNT_IP   compute1
 EOF
 
 sleep 3
-echo "##### Config network for COMPUTE NODE ####"
+echocolor "Config network for COMPUTE NODE"
 ifaces=/etc/network/interfaces
 test -f $ifaces.orig || cp $ifaces $ifaces.orig
 rm $ifaces
@@ -59,7 +60,7 @@ dns-nameservers 8.8.8.8
 EOF
 
 sleep 5
-echo "##### Rebooting machine ... #####"
+echocolor "##### Rebooting machine ... #####"
 init 6
 #
 

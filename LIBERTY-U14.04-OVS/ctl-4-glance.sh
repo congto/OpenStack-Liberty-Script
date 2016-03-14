@@ -39,32 +39,32 @@ test -f $glanceapi_ctl.orig || cp $glanceapi_ctl $glanceapi_ctl.orig
 
 #Configuring glance config file /etc/glance/glance-api.conf
 
-ops_edit_file $glanceapi_ctl database \
+ops_edit $glanceapi_ctl database \
 connection  mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
 ops_del $glanceapi_ctl database sqlite_db
 
-ops_edit_file $glanceapi_ctl keystone_authtoken \
+ops_edit $glanceapi_ctl keystone_authtoken \
 auth_uri http://$CON_MGNT_IP:5000
 
-ops_edit_file $glanceapi_ctl keystone_authtoken \
+ops_edit $glanceapi_ctl keystone_authtoken \
 auth_url http://$CON_MGNT_IP:35357
 
-ops_edit_file $glanceapi_ctl keystone_authtoken auth_plugin password
-ops_edit_file $glanceapi_ctl keystone_authtoken project_domain_id default
-ops_edit_file $glanceapi_ctl keystone_authtoken user_domain_id default
-ops_edit_file $glanceapi_ctl keystone_authtoken project_name service
-ops_edit_file $glanceapi_ctl keystone_authtoken username glance
-ops_edit_file $glanceapi_ctl keystone_authtoken password $GLANCE_PASS
+ops_edit $glanceapi_ctl keystone_authtoken auth_plugin password
+ops_edit $glanceapi_ctl keystone_authtoken project_domain_id default
+ops_edit $glanceapi_ctl keystone_authtoken user_domain_id default
+ops_edit $glanceapi_ctl keystone_authtoken project_name service
+ops_edit $glanceapi_ctl keystone_authtoken username glance
+ops_edit $glanceapi_ctl keystone_authtoken password $GLANCE_PASS
 
 
-ops_edit_file $glanceapi_ctl paste_deploy flavor keystone
+ops_edit $glanceapi_ctl paste_deploy flavor keystone
 
-ops_edit_file $glanceapi_ctl glance_store default_store file
-ops_edit_file $glanceapi_ctl glance_store \
+ops_edit $glanceapi_ctl glance_store default_store file
+ops_edit $glanceapi_ctl glance_store \
 filesystem_store_datadir /var/lib/glance/images/
 
-ops_edit_file $glanceapi_ctl DEFAULT  notification_driver noop
-ops_edit_file $glanceapi_ctl DEFAULT  verbose True
+ops_edit $glanceapi_ctl DEFAULT  notification_driver noop
+ops_edit $glanceapi_ctl DEFAULT  verbose True
 
 
 #
@@ -74,29 +74,29 @@ echocolor "Configuring GLANCE REGISTER"
 glancereg_ctl=/etc/glance/glance-registry.conf
 test -f $glancereg_ctl.orig || cp $glancereg_ctl $glancereg_ctl.orig
 
-ops_edit_file $glancereg_ctl database \
+ops_edit $glancereg_ctl database \
 connection  mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
 ops_del $glancereg_ctl database sqlite_db
 
-ops_edit_file $glancereg_ctl keystone_authtoken \
+ops_edit $glancereg_ctl keystone_authtoken \
 auth_uri http://$CON_MGNT_IP:5000
 
-ops_edit_file $glancereg_ctl keystone_authtoken \
+ops_edit $glancereg_ctl keystone_authtoken \
 auth_url http://$CON_MGNT_IP:35357
 
-ops_edit_file $glancereg_ctl keystone_authtoken auth_plugin password
-ops_edit_file $glancereg_ctl keystone_authtoken project_domain_id default
-ops_edit_file $glancereg_ctl keystone_authtoken user_domain_id default
-ops_edit_file $glancereg_ctl keystone_authtoken project_name service
-ops_edit_file $glancereg_ctl keystone_authtoken username glance
-ops_edit_file $glancereg_ctl keystone_authtoken password $GLANCE_PASS
+ops_edit $glancereg_ctl keystone_authtoken auth_plugin password
+ops_edit $glancereg_ctl keystone_authtoken project_domain_id default
+ops_edit $glancereg_ctl keystone_authtoken user_domain_id default
+ops_edit $glancereg_ctl keystone_authtoken project_name service
+ops_edit $glancereg_ctl keystone_authtoken username glance
+ops_edit $glancereg_ctl keystone_authtoken password $GLANCE_PASS
 
 
-ops_edit_file $glancereg_ctl paste_deploy flavor keystone
+ops_edit $glancereg_ctl paste_deploy flavor keystone
 
 
-ops_edit_file $glancereg_ctl DEFAULT  notification_driver noop
-ops_edit_file $glancereg_ctl DEFAULT  verbose True
+ops_edit $glancereg_ctl DEFAULT  notification_driver noop
+ops_edit $glancereg_ctl DEFAULT  verbose True
 
 
 sleep 7

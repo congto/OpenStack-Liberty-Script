@@ -2,6 +2,10 @@
 #
 
 source config.cfg
+source functions.sh
+
+apt-get -y install python-pip
+pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
 
 #
 
@@ -11,15 +15,15 @@ echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
 echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
 
 
-echo "##### Install python openstack client ##### "
+echocolor "Install python openstack client"
 apt-get -y install python-openstackclient
 
-echo "##### Install NTP ##### "
+echocolor "Install NTP"
 
 apt-get install ntp -y
 apt-get install python-mysqldb -y
 #
-echo "##### Backup NTP configuration... ##### "
+echocolor "Backup NTP configuration"
 sleep 7 
 cp /etc/ntp.conf /etc/ntp.conf.bka
 rm /etc/ntp.conf
@@ -40,7 +44,7 @@ sed -i 's/server 3.ubuntu.pool.ntp.org/ \
 sed -i "s/server ntp.ubuntu.com/server $CON_MGNT_IP iburst/g" /etc/ntp.conf
 
 sleep 5
-echo "##### Installl package for NOVA"
+echocolor "Installl package for NOVA"
 apt-get -y install nova-compute 
 echo "libguestfs-tools        libguestfs/update-appliance     boolean true"  | debconf-set-selections
 apt-get -y install libguestfs-tools sysfsutils guestfsd python-guestfs
@@ -50,7 +54,7 @@ update-guestfs-appliance
 chmod 0644 /boot/vmlinuz*
 usermod -a -G kvm root
 
-echo "############ Configuring in nova.conf ...############"
+echocolor "Configuring in nova.conf"
 sleep 5
 ########
 #/* Sao luu truoc khi sua file nova.conf
@@ -225,7 +229,7 @@ tunnel_types = gre
 EOF
 
 
-echo "Reset service nova-compute,openvswitch-agent"
+echocolor "Reset service nova-compute,openvswitch-agent"
 sleep 5
 service nova-compute restart
 service neutron-plugin-openvswitch-agent restart

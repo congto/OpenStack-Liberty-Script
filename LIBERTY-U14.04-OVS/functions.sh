@@ -7,7 +7,7 @@ echo "$(tput setaf 3)##### $1 #####$(tput sgr0)"
 
 
 # Ham sua file cau hinh cua OpenStack
-function ops_edit_file() {
+function ops_edit() {
         crudini --set $1 $2 $3 $4 
 }
 

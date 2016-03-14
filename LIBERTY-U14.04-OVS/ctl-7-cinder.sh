@@ -52,42 +52,42 @@ cinder_ctl=/etc/cinder/cinder.conf
 test -f $cinder_ctl.orig || cp $cinder_ctl $cinder_ctl.orig
 
 ## [DEFAULT] section
-ops_edit_file $cinder_ctl DEFAULT rpc_backend rabbit
-ops_edit_file $cinder_ctl DEFAULT auth_strategy keystone
-ops_edit_file $cinder_ctl DEFAULT my_ip $CON_MGNT_IP
-ops_edit_file $cinder_ctl DEFAULT verbose True
-ops_edit_file $cinder_ctl DEFAULT enabled_backends lvm
-ops_edit_file $cinder_ctl DEFAULT glance_host $CON_MGNT_IP
-ops_edit_file $cinder_ctl DEFAULT notification_driver messagingv2
+ops_edit $cinder_ctl DEFAULT rpc_backend rabbit
+ops_edit $cinder_ctl DEFAULT auth_strategy keystone
+ops_edit $cinder_ctl DEFAULT my_ip $CON_MGNT_IP
+ops_edit $cinder_ctl DEFAULT verbose True
+ops_edit $cinder_ctl DEFAULT enabled_backends lvm
+ops_edit $cinder_ctl DEFAULT glance_host $CON_MGNT_IP
+ops_edit $cinder_ctl DEFAULT notification_driver messagingv2
 
 ## [database] section
-ops_edit_file $cinder_ctl \
+ops_edit $cinder_ctl \
 connection mysql+pymysql://cinder:$CINDER_DBPASS@$CON_MGNT_IP/cinder
 
 ## [oslo_messaging_rabbit] section
-ops_edit_file $cinder_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
-ops_edit_file $cinder_ctl oslo_messaging_rabbit rabbit_userid openstack
-ops_edit_file $cinder_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+ops_edit $cinder_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit $cinder_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_edit $cinder_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 ## [keystone_authtoken] section
-ops_edit_file $cinder_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:50000
-ops_edit_file $cinder_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $cinder_ctl keystone_authtoken auth_plugin password
-ops_edit_file $cinder_ctl keystone_authtoken project_domain_id default
-ops_edit_file $cinder_ctl keystone_authtoken user_domain_id default
-ops_edit_file $cinder_ctl keystone_authtoken project_name service
-ops_edit_file $cinder_ctl keystone_authtoken username cinder
-ops_edit_file $cinder_ctl keystone_authtoken password $CINDER_PASS
+ops_edit $cinder_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:50000
+ops_edit $cinder_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $cinder_ctl keystone_authtoken auth_plugin password
+ops_edit $cinder_ctl keystone_authtoken project_domain_id default
+ops_edit $cinder_ctl keystone_authtoken user_domain_id default
+ops_edit $cinder_ctl keystone_authtoken project_name service
+ops_edit $cinder_ctl keystone_authtoken username cinder
+ops_edit $cinder_ctl keystone_authtoken password $CINDER_PASS
 
 ## [oslo_concurrency] section
-ops_edit_file $cinder_ctl oslo_concurrency lock_path /var/lib/cinder/tmp
+ops_edit $cinder_ctl oslo_concurrency lock_path /var/lib/cinder/tmp
 
 ## [lvm] section
-ops_edit_file $cinder_ctl lvm \
+ops_edit $cinder_ctl lvm \
 volume_driver cinder.volume.drivers.lvm.LVMVolumeDriver
-ops_edit_file $cinder_ctl lvm volume_group cinder-volumes
-ops_edit_file $cinder_ctl lvm iscsi_protocol iscsi
-ops_edit_file $cinder_ctl lvm iscsi_helper tgtadm
+ops_edit $cinder_ctl lvm volume_group cinder-volumes
+ops_edit $cinder_ctl lvm iscsi_protocol iscsi
+ops_edit $cinder_ctl lvm iscsi_helper tgtadm
 
 
 echocolor "Syncing Cinder DB"

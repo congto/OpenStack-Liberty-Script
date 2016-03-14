@@ -46,59 +46,61 @@ test -f $nova_ctl.orig || cp $nova_ctl $nova_ctl.orig
 echocolor "Config file nova.conf"
 sleep 5
 
-ops_edit_file $nova_ctl DEFAULT verbose True
-ops_edit_file $nova_ctl DEFAULT rpc_backend rabbit
-ops_edit_file $nova_ctl DEFAULT auth_strategy keystone
-ops_edit_file $nova_ctl DEFAULT my_ip $CON_MGNT_IP
-ops_edit_file $nova_ctl DEFAULT network_api_class nova.network.neutronv2.api.API
-ops_edit_file $nova_ctl DEFAULT security_group_api neutron
+ops_edit $nova_ctl DEFAULT verbose True
+ops_edit $nova_ctl DEFAULT rpc_backend rabbit
+ops_edit $nova_ctl DEFAULT auth_strategy keystone
+ops_edit $nova_ctl DEFAULT my_ip $CON_MGNT_IP
+ops_edit $nova_ctl DEFAULT \
+network_api_class nova.network.neutronv2.api.API
 
-ops_edit_file $nova_ctl DEFAULT \
+ops_edit $nova_ctl DEFAULT security_group_api neutron
+
+ops_edit $nova_ctl DEFAULT \
 linuxnet_interface_driver nova.network.linux_net.LinuxOVSInterfaceDriver
 
-ops_edit_file $nova_ctl DEFAULT \
+ops_edit $nova_ctl DEFAULT \
 firewall_driver nova.virt.firewall.NoopFirewallDriver
 
-ops_edit_file $nova_ctl DEFAULT \
+ops_edit $nova_ctl DEFAULT \
 enabled_apis osapi_compute,metadata
 
-ops_edit_file $nova_ctl database \
+ops_edit $nova_ctl database \
 connection mysql+pymysql://nova:$NOVA_DBPASS@$CON_MGNT_IP/nova
 
-ops_edit_file $nova_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
-ops_edit_file $nova_ctl oslo_messaging_rabbit rabbit_userid openstack
-ops_edit_file $nova_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+ops_edit $nova_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit $nova_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_edit $nova_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
-ops_edit_file $nova_ctl keystone_authtoken auth_uri $http://$CON_MGNT_IP:5000
-ops_edit_file $nova_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $nova_ctl keystone_authtoken auth_plugin password
-ops_edit_file $nova_ctl keystone_authtoken project_domain_id default
-ops_edit_file $nova_ctl keystone_authtoken user_domain_id default
-ops_edit_file $nova_ctl keystone_authtoken project_name service
-ops_edit_file $nova_ctl keystone_authtoken username nova
-ops_edit_file $nova_ctl keystone_authtoken password $NOVA_PASS
+ops_edit $nova_ctl keystone_authtoken auth_uri $http://$CON_MGNT_IP:5000
+ops_edit $nova_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $nova_ctl keystone_authtoken auth_plugin password
+ops_edit $nova_ctl keystone_authtoken project_domain_id default
+ops_edit $nova_ctl keystone_authtoken user_domain_id default
+ops_edit $nova_ctl keystone_authtoken project_name service
+ops_edit $nova_ctl keystone_authtoken username nova
+ops_edit $nova_ctl keystone_authtoken password $NOVA_PASS
 
-ops_edit_file $nova_ctl vnc vncserver_listen \$my_ip
-ops_edit_file $nova_ctl vnc vncserver_proxyclient_address \$my_ip
+ops_edit $nova_ctl vnc vncserver_listen \$my_ip
+ops_edit $nova_ctl vnc vncserver_proxyclient_address \$my_ip
 
-ops_edit_file $nova_ctl glance host $CON_MGNT_IP
+ops_edit $nova_ctl glance host $CON_MGNT_IP
 
-ops_edit_file $nova_ctl oslo_concurrency lock_path /var/lib/nova/tmp
+ops_edit $nova_ctl oslo_concurrency lock_path /var/lib/nova/tmp
 
-ops_edit_file $nova_ctl neutron url http://$CON_MGNT_IP:9696
-ops_edit_file $nova_ctl neutron auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $nova_ctl neutron auth_plugin password
-ops_edit_file $nova_ctl neutron project_domain_id default
-ops_edit_file $nova_ctl neutron user_domain_id default
-ops_edit_file $nova_ctl neutron region_name RegionOne
-ops_edit_file $nova_ctl neutron project_name service
-ops_edit_file $nova_ctl neutron username neutron
-ops_edit_file $nova_ctl neutron password $NEUTRON_PASS
-ops_edit_file $nova_ctl neutron service_metadata_proxy True
-ops_edit_file $nova_ctl neutron metadata_proxy_shared_secret $METADATA_SECRET
+ops_edit $nova_ctl neutron url http://$CON_MGNT_IP:9696
+ops_edit $nova_ctl neutron auth_url http://$CON_MGNT_IP:35357
+ops_edit $nova_ctl neutron auth_plugin password
+ops_edit $nova_ctl neutron project_domain_id default
+ops_edit $nova_ctl neutron user_domain_id default
+ops_edit $nova_ctl neutron region_name RegionOne
+ops_edit $nova_ctl neutron project_name service
+ops_edit $nova_ctl neutron username neutron
+ops_edit $nova_ctl neutron password $NEUTRON_PASS
+ops_edit $nova_ctl neutron service_metadata_proxy True
+ops_edit $nova_ctl neutron metadata_proxy_shared_secret $METADATA_SECRET
 
 ## [cinder] Section 
-ops_edit_file $nova_ctl cinder os_region_name RegionOne
+ops_edit $nova_ctl cinder os_region_name RegionOne
 
 
 echocolor "########## Remove Nova default db ##########"

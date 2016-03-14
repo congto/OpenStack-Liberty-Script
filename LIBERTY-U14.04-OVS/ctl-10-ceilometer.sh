@@ -43,39 +43,39 @@ ceilometer_ctl=/etc/ceilometer/ceilometer.conf
 test -f $ceilometer_ctl.orig || cp $ceilometer_ctl $ceilometer_ctl.orig
 
 ## [DEFAULT] section
-ops_edit_file $ceilometer_ctl DEFAULT verbose True
-ops_edit_file $ceilometer_ctl DEFAULT rpc_backend rabbit
-ops_edit_file $ceilometer_ctl DEFAULT auth_strategy keystone
+ops_edit $ceilometer_ctl DEFAULT verbose True
+ops_edit $ceilometer_ctl DEFAULT rpc_backend rabbit
+ops_edit $ceilometer_ctl DEFAULT auth_strategy keystone
 
 ## [database] section
-ops_edit_file $ceilometer_ctl database \
+ops_edit $ceilometer_ctl database \
 connection mongodb://ceilometer:$CEILOMETER_DBPASS@$CON_MGNT_IP:27017/ceilometer
 
 ## [keystone_authtoken] section
-ops_edit_file $ceilometer_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
-ops_edit_file $ceilometer_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
-ops_edit_file $ceilometer_ctl keystone_authtoken auth_plugin password
-ops_edit_file $ceilometer_ctl keystone_authtoken project_domain_id default
-ops_edit_file $ceilometer_ctl keystone_authtoken user_domain_id default
-ops_edit_file $ceilometer_ctl keystone_authtoken project_name service
-ops_edit_file $ceilometer_ctl keystone_authtoken username ceilometer
-ops_edit_file $ceilometer_ctl keystone_authtoken password $CEILOMETER_PASS
+ops_edit $ceilometer_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
+ops_edit $ceilometer_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $ceilometer_ctl keystone_authtoken auth_plugin password
+ops_edit $ceilometer_ctl keystone_authtoken project_domain_id default
+ops_edit $ceilometer_ctl keystone_authtoken user_domain_id default
+ops_edit $ceilometer_ctl keystone_authtoken project_name service
+ops_edit $ceilometer_ctl keystone_authtoken username ceilometer
+ops_edit $ceilometer_ctl keystone_authtoken password $CEILOMETER_PASS
 
 
 ## [service_credentials] section
-ops_edit_file $ceilometer_ctl service_credentials \
+ops_edit $ceilometer_ctl service_credentials \
 os_auth_url http://$CON_MGNT_IP:5000/v2.0
-ops_edit_file $ceilometer_ctl service_credentials os_username ceilometer
-ops_edit_file $ceilometer_ctl service_credentials os_tenant_name service
-ops_edit_file $ceilometer_ctl service_credentials os_password $CEILOMETER_PASS
-ops_edit_file $ceilometer_ctl service_credentials os_endpoint_type internalURL
-ops_edit_file $ceilometer_ctl service_credentials os_region_name RegionOne
+ops_edit $ceilometer_ctl service_credentials os_username ceilometer
+ops_edit $ceilometer_ctl service_credentials os_tenant_name service
+ops_edit $ceilometer_ctl service_credentials os_password $CEILOMETER_PASS
+ops_edit $ceilometer_ctl service_credentials os_endpoint_type internalURL
+ops_edit $ceilometer_ctl service_credentials os_region_name RegionOne
 
 
 ## [oslo_messaging_rabbit] section
-ops_edit_file $ceilometer_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
-ops_edit_file $ceilometer_ctl oslo_messaging_rabbit rabbit_userid openstack
-ops_edit_file $ceilometer_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+ops_edit $ceilometer_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit $ceilometer_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_edit $ceilometer_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 EOF
 

@@ -25,15 +25,15 @@ filekeystone=/etc/keystone/keystone.conf
 test -f $filekeystone.orig || cp $filekeystone $filekeystone.orig
  
 #Config file /etc/keystone/keystone.conf
-ops_edit_file $filekeystone DEFAULT admin_token $TOKEN_PASS
-ops_edit_file $filekeystone DEFAULT verbose True
-ops_edit_file $filekeystone database \
+ops_edit $filekeystone DEFAULT admin_token $TOKEN_PASS
+ops_edit $filekeystone DEFAULT verbose True
+ops_edit $filekeystone database \
 connection mysql+pymysql://keystone:$KEYSTONE_DBPASS@$CON_MGNT_IP/keystone
 
-ops_edit_file $filekeystone memcache servers localhost:11211
-ops_edit_file $filekeystone token provider uuid
-ops_edit_file $filekeystone token driver memcache
-ops_edit_file $filekeystone revoke driver sql
+ops_edit $filekeystone memcache servers localhost:11211
+ops_edit $filekeystone token provider uuid
+ops_edit $filekeystone token driver memcache
+ops_edit $filekeystone revoke driver sql
 
 #
 su -s /bin/sh -c "keystone-manage db_sync" keystone

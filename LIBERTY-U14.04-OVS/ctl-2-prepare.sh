@@ -7,7 +7,8 @@ echocolor "Cai dat goi CRUDINI"
 sleep 3
 
 apt-get -y install python-pip
-pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
+pip install \
+	https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
 
 echocolor "Install python client"
 apt-get -y install python-openstackclient
@@ -53,13 +54,14 @@ echocolor "Finish setup pre-install package !!!"
 echocolor "##### Install MYSQL #####"
 sleep 3
 
-echo mysql-server mysql-server/root_password password $MYSQL_PASS | debconf-set-selections
-echo mysql-server mysql-server/root_password_again password $MYSQL_PASS | debconf-set-selections
+echo mysql-server mysql-server/root_password password \
+$MYSQL_PASS | debconf-set-selections
+echo mysql-server mysql-server/root_password_again password \
+$MYSQL_PASS | debconf-set-selections
 apt-get -y install mariadb-server python-mysqldb curl 
 
 echocolor "##### Configuring MYSQL #####"
 sleep 3
-
 
 echocolor "########## CONFIGURING FOR MYSQL ##########"
 sleep 5
