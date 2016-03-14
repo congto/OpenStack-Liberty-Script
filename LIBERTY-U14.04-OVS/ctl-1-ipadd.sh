@@ -32,7 +32,7 @@ EOF
 
 echocolor "Configuring hostname in CONTROLLER node"
 sleep 3
-echocolor "controller" > /etc/hostname
+echo "controller" > /etc/hostname
 hostname -F /etc/hostname
 
 
