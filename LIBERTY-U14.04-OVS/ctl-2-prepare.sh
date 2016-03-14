@@ -2,22 +2,16 @@
 #
 source config.cfg
 
-function echocolor() { # $1 = string
-    COLOR='\033[01;93m'
-    NC='\033[0m'
-    printf "${COLOR}$1${NC}\n"
-}
-
-echocolor "Cai dat goi CRUDINI"
+echocolorcolor "Cai dat goi CRUDINI"
 sleep 3
 apt-get -y install python-pip
 pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
 
-echocolor "Install python client"
+echocolorcolor "Install python client"
 apt-get -y install python-openstackclient
 sleep 5
 
-echo "Install and config NTP"
+echocolor "Install and config NTP"
 sleep 3 
 apt-get install ntp -y
 cp /etc/ntp.conf /etc/ntp.conf.bka
@@ -39,10 +33,10 @@ restrict -4 default kod notrap nomodify \
 restrict -6 default kod notrap nomodify/g' /etc/ntp.conf
 
 # sed -i 's/server/#server/' /etc/ntp.conf
-# echo "server $LOCAL_IP" >> /etc/ntp.conf
+# echocolor "server $LOCAL_IP" >> /etc/ntp.conf
 
 ##############################################
-echo "Install and Config RabbitMQ"
+echocolor "Install and Config RabbitMQ"
 sleep 3
 
 apt-get install rabbitmq-server -y
@@ -52,20 +46,20 @@ rabbitmqctl set_permissions openstack ".*" ".*" ".*"
 sleep 3
 
 service rabbitmq-server restart
-echo "Finish setup pre-install package !!!"
+echocolor "Finish setup pre-install package !!!"
 
-echo "##### Install MYSQL #####"
+echocolor "##### Install MYSQL #####"
 sleep 3
 
-echo mysql-server mysql-server/root_password password $MYSQL_PASS | debconf-set-selections
-echo mysql-server mysql-server/root_password_again password $MYSQL_PASS | debconf-set-selections
+echocolor mysql-server mysql-server/root_password password $MYSQL_PASS | debconf-set-selections
+echocolor mysql-server mysql-server/root_password_again password $MYSQL_PASS | debconf-set-selections
 apt-get -y install mariadb-server python-mysqldb curl 
 
-echo "##### Configuring MYSQL #####"
+echocolor "##### Configuring MYSQL #####"
 sleep 3
 
 
-echo "########## CONFIGURING FOR MYSQL ##########"
+echocolor "########## CONFIGURING FOR MYSQL ##########"
 sleep 5
 touch /etc/mysql/conf.d/mysqld_openstack.cnf
 cat << EOF > /etc/mysql/conf.d/mysqld_openstack.cnf
@@ -83,7 +77,7 @@ character-set-server = utf8
 EOF
 
 sleep 5
-echo "Restart MYSQL"
+echocolor "Restart MYSQL"
 service mysql restart
 
 

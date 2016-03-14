@@ -1,8 +1,9 @@
 #!/bin/bash -ex
 #
 source config.cfg
+source functions.sh
 
-echo "Create Database for Keystone"
+echocolor "Create Database for Keystone"
 
 cat << EOF | mysql -uroot -p$MYSQL_PASS
 CREATE DATABASE keystone;
@@ -11,89 +12,31 @@ GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$KEYSTONE_DB
 FLUSH PRIVILEGES;
 EOF
 
-echo "##### Install keystone #####"
+echocolor "##### Install keystone #####"
  
-echo "manual" > /etc/init/keystone.override
+echocolor "manual" > /etc/init/keystone.override
  
 
 apt-get install keystone apache2 libapache2-mod-wsgi \
         memcached python-memcache
   
-#/* Back-up file nova.conf
+# Back-up file nova.conf
 filekeystone=/etc/keystone/keystone.conf
 test -f $filekeystone.orig || cp $filekeystone $filekeystone.orig
  
 #Config file /etc/keystone/keystone.conf
-cat << EOF > $filekeystone
+ops_edit_file $filekeystone DEFAULT admin_token $TOKEN_PASS
+ops_edit_file $filekeystone DEFAULT verbose True
+ops_edit_file $filekeystone connection mysql+pymysql://keystone:$KEYSTONE_DBPASS@$CON_MGNT_IP/keystone
+ops_edit_file $filekeystone memcache servers localhost:11211
+ops_edit_file $filekeystone token provider uuid
+ops_edit_file $filekeystone token driver memcache
+ops_edit_file $filekeystone revoke driver sql
 
-[DEFAULT]
-log_dir = /var/log/keystone
-verbose = True
-
-admin_token = $TOKEN_PASS
-public_bind_host = $CON_MGNT_IP
-admin_bind_host = $CON_MGNT_IP
-
-[assignment]
-[auth]
-[cache]
-[catalog]
-[cors]
-[cors.subdomain]
-[credential]
-[database]
-connection = mysql+pymysql://keystone:$KEYSTONE_DBPASS@$CON_MGNT_IP/keystone
-
-
-[domain_config]
-[endpoint_filter]
-[endpoint_policy]
-[eventlet_server]
-[eventlet_server_ssl]
-[federation]
-[fernet_tokens]
-[identity]
-[identity_mapping]
-[kvs]
-[ldap]
-[matchmaker_redis]
-[matchmaker_ring]
-[memcache]
-servers = localhost:11211
-
-
-[oauth1]
-[os_inherit]
-[oslo_messaging_amqp]
-[oslo_messaging_qpid]
-[oslo_messaging_rabbit]
-[oslo_middleware]
-[oslo_policy]
-[paste_deploy]
-[policy]
-[resource]
-[revoke]
-driver = sql
-
-[role]
-[saml]
-[signing]
-[ssl]
-[token]
-provider = uuid
-driver = memcache
-
-[tokenless_auth]
-[trust]
-[extra_headers]
-Distribution = Ubuntu
-
-EOF
- 
 #
 su -s /bin/sh -c "keystone-manage db_sync" keystone
  
-echo "ServerName $CON_MGNT_IP" >>  /etc/apache2/apache2.conf
+echocolor "ServerName $CON_MGNT_IP" >>  /etc/apache2/apache2.conf
 
  
 cat << EOF > /etc/apache2/sites-available/wsgi-keystone.conf
@@ -198,31 +141,31 @@ unset OS_TOKEN OS_URL
  
 # Tao bien moi truong
  
-echo "export OS_PROJECT_DOMAIN_ID=default" > admin-openrc.sh
-echo "export OS_USER_DOMAIN_ID=default" >> admin-openrc.sh
-echo "export OS_PROJECT_NAME=admin" >> admin-openrc.sh
-echo "export OS_TENANT_NAME=admin" >> admin-openrc.sh
-echo "export OS_USERNAME=admin" >> admin-openrc.sh
-echo "export OS_PASSWORD=$ADMIN_PASS"  >> admin-openrc.sh
-echo "export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3" >> admin-openrc.sh
-echo "export OS_VOLUME_API_VERSION=2"   >> admin-openrc.sh
+echocolor "export OS_PROJECT_DOMAIN_ID=default" > admin-openrc.sh
+echocolor "export OS_USER_DOMAIN_ID=default" >> admin-openrc.sh
+echocolor "export OS_PROJECT_NAME=admin" >> admin-openrc.sh
+echocolor "export OS_TENANT_NAME=admin" >> admin-openrc.sh
+echocolor "export OS_USERNAME=admin" >> admin-openrc.sh
+echocolor "export OS_PASSWORD=$ADMIN_PASS"  >> admin-openrc.sh
+echocolor "export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3" >> admin-openrc.sh
+echocolor "export OS_VOLUME_API_VERSION=2"   >> admin-openrc.sh
 
 sleep 5
-echo "########## Execute environment script ##########"
+echocolor "########## Execute environment script ##########"
 chmod +x admin-openrc.sh
 cat  admin-openrc.sh >> /etc/profile
 cp  admin-openrc.sh /root/admin-openrc.sh
 source admin-openrc.sh
 
 
-echo "export OS_PROJECT_DOMAIN_ID=default" > demo-openrc.sh
-echo "export OS_USER_DOMAIN_ID=default" >> demo-openrc.sh
-echo "export OS_PROJECT_NAME=demo" >> demo-openrc.sh
-echo "export OS_TENANT_NAME=demo" >> demo-openrc.sh
-echo "export OS_USERNAME=demo" >> demo-openrc.sh
-echo "export OS_PASSWORD=$ADMIN_PASS"  >> demo-openrc.sh
-echo "export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3" >> demo-openrc.sh
-echo "export OS_VOLUME_API_VERSION=2"  >> demo-openrc.sh
+echocolor "export OS_PROJECT_DOMAIN_ID=default" > demo-openrc.sh
+echocolor "export OS_USER_DOMAIN_ID=default" >> demo-openrc.sh
+echocolor "export OS_PROJECT_NAME=demo" >> demo-openrc.sh
+echocolor "export OS_TENANT_NAME=demo" >> demo-openrc.sh
+echocolor "export OS_USERNAME=demo" >> demo-openrc.sh
+echocolor "export OS_PASSWORD=$ADMIN_PASS"  >> demo-openrc.sh
+echocolor "export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3" >> demo-openrc.sh
+echocolor "export OS_VOLUME_API_VERSION=2"  >> demo-openrc.sh
 
 chmod +x demo-openrc.sh
 cp  demo-openrc.sh /root/demo-openrc.sh
