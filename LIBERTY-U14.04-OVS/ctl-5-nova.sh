@@ -39,83 +39,62 @@ apt-get -y install libguestfs-tools sysfsutils guestfsd python-guestfs
 sleep 7
 
 #
-controlnova=/etc/nova/nova.conf
-test -f $controlnova.orig || cp $controlnova $controlnova.orig
-rm $controlnova
-touch $controlnova
-cat << EOF >> $controlnova
-[DEFAULT]
+nova_ctl=/etc/nova/nova.conf
+test -f $nova_ctl.orig || cp $nova_ctl $nova_ctl.orig
 
-rpc_backend = rabbit
-auth_strategy = keystone
+ops_edit_file $nova_ctl DEFAULT verbose True
+ops_edit_file $nova_ctl DEFAULT rpc_backend rabbit
+ops_edit_file $nova_ctl DEFAULT auth_strategy keystone
+ops_edit_file $nova_ctl DEFAULT my_ip $CON_MGNT_IP
+ops_edit_file $nova_ctl DEFAULT network_api_class nova.network.neutronv2.api.API
+ops_edit_file $nova_ctl DEFAULT security_group_api neutron
 
-dhcpbridge_flagfile=/etc/nova/nova.conf
-dhcpbridge=/usr/bin/nova-dhcpbridge
-logdir=/var/log/nova
-state_path=/var/lib/nova
-lock_path=/var/lock/nova
-force_dhcp_release=True
-libvirt_use_virtio_for_bridges=True
-ec2_private_dns_show_ip=True
-api_paste_config=/etc/nova/api-paste.ini
-enabled_apis=ec2,osapi_compute,metadata
+ops_edit_file $nova_ctl DEFAULT \
+linuxnet_interface_driver nova.network.linux_net.LinuxOVSInterfaceDriver
 
-my_ip = $CON_MGNT_IP
+ops_edit_file $nova_ctl DEFAULT \
+firewall_driver nova.virt.firewall.NoopFirewallDriver
 
-network_api_class = nova.network.neutronv2.api.API
-security_group_api = neutron
-linuxnet_interface_driver = nova.network.linux_net.LinuxOVSInterfaceDriver
-firewall_driver = nova.virt.firewall.NoopFirewallDriver
+ops_edit_file $nova_ctl DEFAULT \
+enabled_apis osapi_compute,metadata
+
+ops_edit_file $nova_ctl DEFAULT verbose True
 
 
-enabled_apis=osapi_compute,metadata
-verbose = True
+ops_edit_file $nova_ctl database \
+connection mysql+pymysql://nova:$NOVA_DBPASS@$CON_MGNT_IP/nova
 
-enable_instance_password = True
+ops_edit_file $nova_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit_file $nova_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_edit_file $nova_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
-[database]
-connection = mysql+pymysql://nova:$NOVA_DBPASS@$CON_MGNT_IP/nova
+ops_edit_file $nova_ctl keystone_authtoken auth_uri $http://$CON_MGNT_IP:5000
+ops_edit_file $nova_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit_file $nova_ctl keystone_authtoken auth_plugin password
+ops_edit_file $nova_ctl keystone_authtoken project_domain_id default
+ops_edit_file $nova_ctl keystone_authtoken user_domain_id default
+ops_edit_file $nova_ctl keystone_authtoken project_name service
+ops_edit_file $nova_ctl keystone_authtoken username nova
+ops_edit_file $nova_ctl keystone_authtoken password $NOVA_PASS
 
-[oslo_messaging_rabbit]
-rabbit_host = $CON_MGNT_IP
-rabbit_userid = openstack
-rabbit_password = $RABBIT_PASS
+ops_edit_file $nova_ctl vnc vncserver_listen \$my_ip
+ops_edit_file $nova_ctl vnc vncserver_proxyclient_address \$my_ip
 
-[keystone_authtoken]
-auth_uri = http://$CON_MGNT_IP:5000
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-project_name = service
-username = nova
-password = $NOVA_PASS
+ops_edit_file $nova_ctl glance host $CON_MGNT_IP
 
-[vnc]
-vncserver_listen = \$my_ip
-vncserver_proxyclient_address = \$my_ip
+ops_edit_file $nova_ctl oslo_concurrency lock_path /var/lib/nova/tmp
 
-[glance]
-host = $CON_MGNT_IP
-
-[oslo_concurrency]
-lock_path = /var/lib/nova/tmp
-
-[neutron]
-url = http://$CON_MGNT_IP:9696
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-region_name = RegionOne
-project_name = service
-username = neutron
-password = $NEUTRON_PASS
-
-service_metadata_proxy = True
-metadata_proxy_shared_secret = $METADATA_SECRET
-
-EOF
+ops_edit_file $nova_ctl neutron url http://$CON_MGNT_IP:9696
+ops_edit_file $nova_ctl neutron auth_url http://$CON_MGNT_IP:35357
+ops_edit_file $nova_ctl neutron auth_plugin password
+ops_edit_file $nova_ctl neutron project_domain_id default
+ops_edit_file $nova_ctl neutron user_domain_id default
+ops_edit_file $nova_ctl neutron region_name RegionOne
+ops_edit_file $nova_ctl neutron project_name service
+ops_edit_file $nova_ctl neutron username neutron
+ops_edit_file $nova_ctl neutron password $NEUTRON_PASS
+ops_edit_file $nova_ctl neutron service_metadata_proxy True
+ops_edit_file $nova_ctl neutron metadata_proxy_shared_secret $METADATA_SECRET
 
 echo "########## Remove Nova default db ##########"
 sleep 7

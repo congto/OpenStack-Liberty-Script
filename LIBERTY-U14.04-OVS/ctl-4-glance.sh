@@ -3,7 +3,7 @@
 source config.cfg
 source functions.sh
 
-echocolorcolor "Create the database for GLANCE"
+echocolor "Create the database for GLANCE"
 cat << EOF | mysql -uroot -p$MYSQL_PASS
 CREATE DATABASE glance;
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCE_DBPASS';
@@ -41,6 +41,7 @@ test -f $glanceapi_ctl.orig || cp $glanceapi_ctl $glanceapi_ctl.orig
 
 ops_edit_file $glanceapi_ctl database \
 connection  mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
+ops_del $glanceapi_ctl database sqlite_db
 
 ops_edit_file $glanceapi_ctl keystone_authtoken \
 auth_uri http://$CON_MGNT_IP:5000
@@ -66,9 +67,6 @@ ops_edit_file $glanceapi_ctl DEFAULT  notification_driver noop
 ops_edit_file $glanceapi_ctl DEFAULT  verbose True
 
 
-
-
-
 #
 sleep 10
 echocolor "Configuring GLANCE REGISTER"
@@ -78,6 +76,7 @@ test -f $glancereg_ctl.orig || cp $glancereg_ctl $glancereg_ctl.orig
 
 ops_edit_file $glancereg_ctl database \
 connection  mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
+ops_del $glancereg_ctl database sqlite_db
 
 ops_edit_file $glancereg_ctl keystone_authtoken \
 auth_uri http://$CON_MGNT_IP:5000
