@@ -38,7 +38,7 @@ ops_edit_file $filekeystone revoke driver sql
 #
 su -s /bin/sh -c "keystone-manage db_sync" keystone
  
-echocolor "ServerName $CON_MGNT_IP" >>  /etc/apache2/apache2.conf
+echo "ServerName $CON_MGNT_IP" >>  /etc/apache2/apache2.conf
 
  
 cat << EOF > /etc/apache2/sites-available/wsgi-keystone.conf
@@ -144,7 +144,7 @@ unset OS_TOKEN OS_URL
  
 # Tao bien moi truong
  
-cat << EOF > admin-openrc
+cat << EOF > admin-openrc.sh
 export OS_PROJECT_DOMAIN_ID=default
 export OS_USER_DOMAIN_ID=default
 export OS_PROJECT_NAME=admin
@@ -163,7 +163,7 @@ cp  admin-openrc.sh /root/admin-openrc.sh
 source admin-openrc.sh
 
 
-cat << EOF > demo-openrc
+cat << EOF > demo-openrc.sh
 export OS_PROJECT_DOMAIN_ID=default
 export OS_USER_DOMAIN_ID=default
 export OS_PROJECT_NAME=demo
