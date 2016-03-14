@@ -1,6 +1,7 @@
 #!/bin/bash -ex
 #
 source config.cfg
+source functions.sh
 
 echocolor "Create DB for NOVA "
 cat << EOF | mysql -uroot -p$MYSQL_PASS
@@ -32,7 +33,7 @@ apt-get -y install nova-api nova-cert nova-conductor \
            python-novaclient
 
 # Cai tu dong libguestfs-tools 
-echocolor "libguestfs-tools        libguestfs/update-appliance     boolean true"  | debconf-set-selections
+echo "libguestfs-tools        libguestfs/update-appliance     boolean true"  | debconf-set-selections
 apt-get -y install libguestfs-tools sysfsutils guestfsd python-guestfs
 
 ######## Backup configurations for NOVA ##########"

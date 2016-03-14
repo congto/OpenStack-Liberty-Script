@@ -4,15 +4,16 @@
 # ADMIN_PASS=a
 
 source config.cfg
+source functions.sh
 
-echo "############ Configuring net forward for all VMs ############"
+echocolor "############ Configuring net forward for all VMs ############"
 sleep 5
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
 echo "net.ipv4.conf.default.rp_filter=0" >> /etc/sysctl.conf
 sysctl -p 
 
-echo "Create DB for NEUTRON "
+echocolor "Create DB for NEUTRON "
 sleep 5
 cat << EOF | mysql -uroot -p$MYSQL_PASS
 CREATE DATABASE neutron;
@@ -22,7 +23,7 @@ FLUSH PRIVILEGES;
 EOF
 
 
-echo "Create  user, endpoint for NEUTRON"
+echocolor "Create  user, endpoint for NEUTRON"
 sleep 5
 openstack user create --password $NEUTRON_PASS neutron
 openstack role add --project service --user neutron admin
@@ -38,15 +39,16 @@ openstack endpoint create \
 # SERVICE_TENANT_ID=`keystone tenant-get service | awk '$2~/^id/{print $4}'`
 
 
-echo "########## Install NEUTRON in 172.16.69.40 or NETWORK node ################"
+echocolor "########## Install NEUTRON node ################"
 sleep 5
 apt-get -y install neutron-server python-neutronclient neutron-plugin-ml2 neutron-plugin-openvswitch-agent \
-neutron-l3-agent neutron-dhcp-agent neutron-metadata-agent neutron-plugin-openvswitch neutron-common
+neutron-l3-agent neutron-dhcp-agent \
+neutron-metadata-agent neutron-plugin-openvswitch neutron-common
 
 
 
 ######## Backup configuration NEUTRON.CONF ##################"
-echo "########## Config NEUTRON ##########"
+echocolor "########## Config NEUTRON ##########"
 sleep 5
 
 #
@@ -115,7 +117,7 @@ EOF
 
 
 ######## Backup configuration of ML2 ##################"
-echo "########## Configuring ML2 ##########"
+echocolor "########## Configuring ML2 ##########"
 sleep 7
 
 controlML2=/etc/neutron/plugins/ml2/ml2_conf.ini
@@ -155,7 +157,7 @@ tunnel_types = gre
 
 EOF
 
-echo "############ Configuring L3 AGENT ############"
+echocolor "############ Configuring L3 AGENT ############"
 sleep 7 
 netl3agent=/etc/neutron/l3_agent.ini
 
@@ -173,7 +175,7 @@ verbose = True
 [AGENT]
 EOF
 
-echo "############  Configuring DHCP AGENT ############ "
+echocolor "############  Configuring DHCP AGENT ############ "
 sleep 7 
 #
 netdhcp=/etc/neutron/dhcp_agent.ini
@@ -193,13 +195,13 @@ dnsmasq_config_file = /etc/neutron/dnsmasq-neutron.conf
 [AGENT]
 EOF
 
-echo "############ Fix loi MTU ############"
+echocolor "############ Fix loi MTU ############"
 sleep 3
 echo "dhcp-option-force=26,1454" > /etc/neutron/dnsmasq-neutron.conf
 killall dnsmasq
 
 
-echo "############  Configuring METADATA AGENT ############"
+echocolor "############  Configuring METADATA AGENT ############"
 sleep 7 
 netmetadata=/etc/neutron/metadata_agent.ini
 
@@ -229,13 +231,13 @@ EOF
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
   
-echo "########## Restarting NOVA service ##########"
+echocolor "########## Restarting NOVA service ##########"
 sleep 7 
 service nova-api restart
 service nova-scheduler restart
 service nova-conductor restart
 
-echo "########## Restarting NEUTRON service ##########"
+echocolor "########## Restarting NEUTRON service ##########"
 sleep 7 
 service neutron-server restart
 service neutron-plugin-openvswitch-agent restart
@@ -245,11 +247,11 @@ service neutron-l3-agent restart
 
 rm -f /var/lib/neutron/neutron.sqlite
 
-echo "########## check service Neutron ##########"
+echocolor "########## check service Neutron ##########"
 neutron agent-list
 sleep 5
 
-echo "########## Config IP address for br-ex ##########"
+echocolor "########## Config IP address for br-ex ##########"
 
 ifaces=/etc/network/interfaces
 test -f $ifaces.orig1 || cp $ifaces $ifaces.orig1
@@ -280,12 +282,12 @@ address $CON_MGNT_IP
 netmask $NETMASK_ADD_MGNT
 EOF
 
-echo "########## Config br-int and br-ex for OpenvSwitch ##########"
+echocolor "Config br-int and br-ex for OpenvSwitch"
 sleep 5
 # ovs-vsctl add-br br-int
 ovs-vsctl add-br br-ex
 ovs-vsctl add-port br-ex eth1
 
 sleep 5
-echo "##### Reboot SERVER #####"
+echocolor "##### Reboot SERVER #####"
 init 6
