@@ -1,13 +1,15 @@
 #!/bin/bash -ex
 #
 source config.cfg
+source functions.sh
 
-echocolorcolor "Cai dat goi CRUDINI"
+echocolor "Cai dat goi CRUDINI"
 sleep 3
+
 apt-get -y install python-pip
 pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
 
-echocolorcolor "Install python client"
+echocolor "Install python client"
 apt-get -y install python-openstackclient
 sleep 5
 
