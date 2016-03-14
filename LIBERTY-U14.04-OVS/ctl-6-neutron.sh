@@ -122,6 +122,8 @@ ops_edit_file $ml2_clt ml2_type_gre tunnel_id_ranges 1:1000
 
 ## [securitygroup] section
 ops_edit_file $ml2_clt securitygroup enable_security_group True
+ops_edit_file $ml2_clt securitygroup enable_ipset True
+
 ops_edit_file $ml2_clt securitygroup \
 firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
@@ -131,6 +133,7 @@ ops_edit_file $ml2_clt ovs bridge_mappings external:br-ex
 
 ## [agent] section
 ops_edit_file $ml2_clt agent tunnel_types gre
+ops_edit_file $ml2_clt agent prevent_arp_spoofing True
 
 
 
