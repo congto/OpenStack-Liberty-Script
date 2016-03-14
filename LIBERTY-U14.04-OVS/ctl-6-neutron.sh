@@ -136,8 +136,6 @@ ops_edit_file $ml2_clt agent tunnel_types gre
 ops_edit_file $ml2_clt agent prevent_arp_spoofing True
 
 
-
-
 echocolor "############ Configuring L3 AGENT ############"
 sleep 7 
 netl3agent=/etc/neutron/l3_agent.ini
