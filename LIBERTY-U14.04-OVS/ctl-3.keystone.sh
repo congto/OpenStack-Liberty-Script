@@ -14,10 +14,10 @@ EOF
 
 echocolor "##### Install keystone #####"
  
-echocolor "manual" > /etc/init/keystone.override
+echo "manual" > /etc/init/keystone.override
  
 
-apt-get install keystone apache2 libapache2-mod-wsgi \
+apt-get -y install keystone apache2 libapache2-mod-wsgi \
         memcached python-memcache
   
 # Back-up file nova.conf
@@ -27,7 +27,9 @@ test -f $filekeystone.orig || cp $filekeystone $filekeystone.orig
 #Config file /etc/keystone/keystone.conf
 ops_edit_file $filekeystone DEFAULT admin_token $TOKEN_PASS
 ops_edit_file $filekeystone DEFAULT verbose True
-ops_edit_file $filekeystone database connection mysql+pymysql://keystone:$KEYSTONE_DBPASS@$CON_MGNT_IP/keystone
+ops_edit_file $filekeystone database \
+connection mysql+pymysql://keystone:$KEYSTONE_DBPASS@$CON_MGNT_IP/keystone
+
 ops_edit_file $filekeystone memcache servers localhost:11211
 ops_edit_file $filekeystone token provider uuid
 ops_edit_file $filekeystone token driver memcache
@@ -98,7 +100,6 @@ service apache2 restart
 
 rm -f /var/lib/keystone/keystone.db
 
-
 export OS_TOKEN="$TOKEN_PASS"
 export OS_URL=http://$CON_MGNT_IP:35357/v2.0
  
@@ -108,7 +109,9 @@ export OS_URL=http://$CON_MGNT_IP:35357/v2.0
 # export SERVICE_ENDPOINT="http://$CON_MGNT_IP:35357/v2.0"
  
 ###  Identity service
-openstack service create --name keystone --description "OpenStack Identity" identity
+openstack service create \
+--name keystone --description "OpenStack Identity" identity
+
 ### Create the Identity service API endpoint
 openstack endpoint create \
 --publicurl http://$CON_MGNT_IP:5000/v2.0 \
@@ -141,14 +144,16 @@ unset OS_TOKEN OS_URL
  
 # Tao bien moi truong
  
-echocolor "export OS_PROJECT_DOMAIN_ID=default" > admin-openrc.sh
-echocolor "export OS_USER_DOMAIN_ID=default" >> admin-openrc.sh
-echocolor "export OS_PROJECT_NAME=admin" >> admin-openrc.sh
-echocolor "export OS_TENANT_NAME=admin" >> admin-openrc.sh
-echocolor "export OS_USERNAME=admin" >> admin-openrc.sh
-echocolor "export OS_PASSWORD=$ADMIN_PASS"  >> admin-openrc.sh
-echocolor "export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3" >> admin-openrc.sh
-echocolor "export OS_VOLUME_API_VERSION=2"   >> admin-openrc.sh
+cat << EOF > admin-openrc
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
+export OS_PROJECT_NAME=admin
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=$ADMIN_PASS
+export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3
+export OS_VOLUME_API_VERSION=2
+EOF
 
 sleep 5
 echocolor "########## Execute environment script ##########"
@@ -158,14 +163,16 @@ cp  admin-openrc.sh /root/admin-openrc.sh
 source admin-openrc.sh
 
 
-echocolor "export OS_PROJECT_DOMAIN_ID=default" > demo-openrc.sh
-echocolor "export OS_USER_DOMAIN_ID=default" >> demo-openrc.sh
-echocolor "export OS_PROJECT_NAME=demo" >> demo-openrc.sh
-echocolor "export OS_TENANT_NAME=demo" >> demo-openrc.sh
-echocolor "export OS_USERNAME=demo" >> demo-openrc.sh
-echocolor "export OS_PASSWORD=$ADMIN_PASS"  >> demo-openrc.sh
-echocolor "export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3" >> demo-openrc.sh
-echocolor "export OS_VOLUME_API_VERSION=2"  >> demo-openrc.sh
+cat << EOF > demo-openrc
+export OS_PROJECT_DOMAIN_ID=default
+export OS_USER_DOMAIN_ID=default
+export OS_PROJECT_NAME=demo
+export OS_TENANT_NAME=demo
+export OS_USERNAME=demo
+export OS_PASSWORD=$ADMIN_PASS
+export OS_AUTH_URL=http://$CON_MGNT_IP:35357/v3
+export OS_VOLUME_API_VERSION=2
+EOF
 
 chmod +x demo-openrc.sh
 cp  demo-openrc.sh /root/demo-openrc.sh
