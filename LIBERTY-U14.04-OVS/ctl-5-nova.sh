@@ -58,9 +58,6 @@ firewall_driver nova.virt.firewall.NoopFirewallDriver
 ops_edit_file $nova_ctl DEFAULT \
 enabled_apis osapi_compute,metadata
 
-ops_edit_file $nova_ctl DEFAULT verbose True
-
-
 ops_edit_file $nova_ctl database \
 connection mysql+pymysql://nova:$NOVA_DBPASS@$CON_MGNT_IP/nova
 
