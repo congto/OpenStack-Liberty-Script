@@ -29,9 +29,9 @@ su -
 apt-get update
 apt-get -y install git 
 
-git clone https://github.com/congto/openstack-liberty-multinode.git
-mv /root/openstack-liberty-multinode/LIBERTY-U14.04-OVS/ /root/
-rm -rf openstack-liberty-multinode/
+git clone https://github.com/congto/OpenStack-Liberty-Script.git
+mv /root/OpenStack-Liberty-Script/LIBERTY-U14.04-OVS/ /root/
+rm -rf OpenStack-Liberty-Script/
 cd LIBERTY-U14.04-OVS/
 chmod +x *.sh
 
@@ -98,9 +98,9 @@ su -
 apt-get update
 apt-get -y install git 
 
-git clone https://github.com/congto/openstack-liberty-multinode.git
-mv /root/openstack-liberty-multinode/LIBERTY-U14.04-OVS/ /root/
-rm -rf openstack-liberty-multinode/
+git clone https://github.com/congto/OpenStack-Liberty-Script.git
+mv /root/OpenStack-Liberty-Script/LIBERTY-U14.04-OVS/ /root/
+rm -rf OpenStack-Liberty-Script/
 cd LIBERTY-U14.04-OVS/
 chmod +x *.sh
 
