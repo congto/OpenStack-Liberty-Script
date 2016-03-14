@@ -4,7 +4,7 @@
 function echocolor() { # $1 = string
     COLOR='\033[01;93m'
     NC='\033[0m'
-    printf "${COLOR}$1${NC}\n"
+    echo "${COLOR}$1${NC}\n"
 }
 
 # Ham sua file cau hinh cua OpenStack
