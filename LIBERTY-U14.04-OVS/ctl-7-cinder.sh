@@ -37,7 +37,7 @@ openstack endpoint create \
 volumev2
 
 #
-echocolor "########## Install CINDER ##########"
+echocolor "Install CINDER"
 sleep 3
 apt-get install -y cinder-api cinder-scheduler python-cinderclient \
 	lvm2 cinder-volume python-mysqldb  qemu 
@@ -90,11 +90,11 @@ ops_edit_file $cinder_ctl lvm iscsi_protocol iscsi
 ops_edit_file $cinder_ctl lvm iscsi_helper tgtadm
 
 
-echocolor "########## Syncing Cinder DB ##########"
+echocolor "Syncing Cinder DB"
 sleep 3
 su -s /bin/sh -c "cinder-manage db sync" cinder
  
-echocolor "########## Restarting CINDER service ##########"
+echocolor "Restarting CINDER service"
 sleep 3
 service tgt restart
 service cinder-volume restart
@@ -103,4 +103,4 @@ service cinder-scheduler restart
 
 rm -f /var/lib/cinder/cinder.sqlite
 
-echocolor "########## Finish setting up CINDER !!! ##########"
+echocolor "Finish setting up CINDER"

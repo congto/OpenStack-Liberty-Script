@@ -2,7 +2,7 @@
 
 # Ham dinh nghia mau cho cac ban tin in ra man hinh
 function echocolor() {
-echo "$(tput setaf 3) $1 $(tput sgr0)"
+echo "$(tput setaf 3)##### $1 #####$(tput sgr0)"
 }
 
 
