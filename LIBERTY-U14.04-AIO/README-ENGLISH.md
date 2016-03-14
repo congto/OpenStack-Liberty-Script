@@ -88,10 +88,10 @@ apt-get -y install git
 
 - Execute the script to set up static IP address for the installed OpenStack server.
 ```sh
-git clone https://github.com/vietstacker/openstack-liberty-multinode.git
+git clone https://github.com/vietstacker/OpenStack-Liberty-Script.git
 
-mv /root/openstack-liberty-multinode/LIBERTY-U14.04-AIO /root
-rm -rf openstack-liberty-multinode
+mv /root/OpenStack-Liberty-Script/LIBERTY-U14.04-AIO /root
+rm -rf OpenStack-Liberty-Script
 
 cd LIBERTY-U14.04-AIO 
 chmod +x *.sh
@@ -112,10 +112,10 @@ bash AIO-LIBERTY-2.sh
 - Login with root permission, in Ubuntu version of 14.04 you must login with normal user first, then move to the root user using `su - ` command
 
 ```sh
-git clone https://github.com/vietstacker/openstack-liberty-multinode.git
+git clone https://github.com/vietstacker/OpenStack-Liberty-Script.git
 
-mv /root/openstack-liberty-multinode/LIBERTY-U14.04-AIO /root
-rm -rf openstack-liberty-multinode
+mv /root/OpenStack-Liberty-Script/LIBERTY-U14.04-AIO /root
+rm -rf OpenStack-Liberty-Script
 
 cd LIBERTY-U14.04-AIO 
 chmod +x *.sh
