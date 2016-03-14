@@ -33,7 +33,7 @@ crudini --set $fileceilomter DEFAULT verbose True
 
 
 # Edit [slo_messaging_rabbit] section 
-crudini --set  $fileceilomter oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+crudini --set $fileceilomter oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
 crudini --set $fileceilomter oslo_messaging_rabbit rabbit_userid openstack
 crudini --set $fileceilomter oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
