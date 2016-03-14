@@ -53,8 +53,8 @@ echocolor "Finish setup pre-install package !!!"
 echocolor "##### Install MYSQL #####"
 sleep 3
 
-echocolor mysql-server mysql-server/root_password password $MYSQL_PASS | debconf-set-selections
-echocolor mysql-server mysql-server/root_password_again password $MYSQL_PASS | debconf-set-selections
+echo mysql-server mysql-server/root_password password $MYSQL_PASS | debconf-set-selections
+echo mysql-server mysql-server/root_password_again password $MYSQL_PASS | debconf-set-selections
 apt-get -y install mariadb-server python-mysqldb curl 
 
 echocolor "##### Configuring MYSQL #####"
