@@ -1,8 +1,9 @@
 #!/bin/bash -ex
 #
 source config.cfg
+source functions.sh
 
-echo "Create the database for GLANCE"
+echocolorcolor "Create the database for GLANCE"
 cat << EOF | mysql -uroot -p$MYSQL_PASS
 CREATE DATABASE glance;
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCE_DBPASS';
@@ -12,11 +13,13 @@ EOF
 
 
 sleep 5
-echo " Create user, endpoint for GLANCE"
+echocolor " Create user, endpoint for GLANCE"
 
 openstack user create --password $GLANCE_PASS glance
 openstack role add --project service --user glance admin
-openstack service create --name glance --description "OpenStack Image service" image
+
+openstack service create --name glance \
+--description "OpenStack Image service" image
 
 openstack endpoint create \
 --publicurl http://$CON_MGNT_IP:9292 \
@@ -25,131 +28,91 @@ openstack endpoint create \
 --region RegionOne \
 image
 
-echo "########## Install GLANCE ##########"
+echocolor "########## Install GLANCE ##########"
 apt-get -y install glance python-glanceclient
 sleep 10
-echo "########## Configuring GLANCE API ##########"
+echocolor "Configuring GLANCE API"
 sleep 5 
 #/* Back-up file nova.conf
-fileglanceapicontrol=/etc/glance/glance-api.conf
-test -f $fileglanceapicontrol.orig || cp $fileglanceapicontrol $fileglanceapicontrol.orig
-rm $fileglanceapicontrol
-touch $fileglanceapicontrol
+glanceapi_ctl=/etc/glance/glance-api.conf
+test -f $glanceapi_ctl.orig || cp $glanceapi_ctl $glanceapi_ctl.orig
 
 #Configuring glance config file /etc/glance/glance-api.conf
 
-cat << EOF > $fileglanceapicontrol
-[DEFAULT]
-notification_driver = noop
-verbose = True
-notification_driver = messagingv2
-rpc_backend = rabbit
+ops_edit_file $glanceapi_ctl database \
+connection  mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
 
-[database]
-connection = mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
-backend = sqlalchemy
+ops_edit_file $glanceapi_ctl keystone_authtoken \
+auth_uri http://$CON_MGNT_IP:5000
 
-[glance_store]
-default_store = file
-filesystem_store_datadir = /var/lib/glance/images/
+ops_edit_file $glanceapi_ctl keystone_authtoken \
+auth_url http://$CON_MGNT_IP:35357
 
-[image_format]
-[keystone_authtoken]
-auth_uri = http://$CON_MGNT_IP:5000
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-project_name = service
-username = glance
-password = $GLANCE_PASS
+ops_edit_file $glanceapi_ctl keystone_authtoken auth_plugin password
+ops_edit_file $glanceapi_ctl keystone_authtoken project_domain_id default
+ops_edit_file $glanceapi_ctl keystone_authtoken user_domain_id default
+ops_edit_file $glanceapi_ctl keystone_authtoken project_name service
+ops_edit_file $glanceapi_ctl keystone_authtoken username glance
+ops_edit_file $glanceapi_ctl keystone_authtoken password $GLANCE_PASS
 
 
-[matchmaker_redis]
-[matchmaker_ring]
-[oslo_concurrency]
-[oslo_messaging_amqp]
-[oslo_messaging_qpid]
+ops_edit_file $glanceapi_ctl paste_deploy flavor keystone
 
-[oslo_messaging_rabbit]
-rabbit_host = $CON_MGNT_IP
-rabbit_userid = openstack
-rabbit_password = $RABBIT_PASS
+ops_edit_file $glanceapi_ctl glance_store default_store file
+ops_edit_file $glanceapi_ctl glance_store \
+filesystem_store_datadir /var/lib/glance/images/
 
-[oslo_policy]
-[paste_deploy]
-flavor = keystone
+ops_edit_file $glanceapi_ctl DEFAULT  notification_driver noop
+ops_edit_file $glanceapi_ctl DEFAULT  verbose True
 
-[store_type_location_strategy]
-[task]
-[taskflow_executor]
 
-EOF
+
+
 
 #
 sleep 10
-echo "########## Configuring GLANCE REGISTER ##########"
+echocolor "Configuring GLANCE REGISTER"
 #/* Backup file file glance-registry.conf
-fileglanceregcontrol=/etc/glance/glance-registry.conf
-test -f $fileglanceregcontrol.orig || cp $fileglanceregcontrol $fileglanceregcontrol.orig
-rm $fileglanceregcontrol
-touch $fileglanceregcontrol
-#Config file /etc/glance/glance-registry.conf
+glancereg_ctl=/etc/glance/glance-registry.conf
+test -f $glancereg_ctl.orig || cp $glancereg_ctl $glancereg_ctl.orig
 
-cat << EOF > $fileglanceregcontrol
+ops_edit_file $glancereg_ctl database \
+connection  mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
 
-[DEFAULT]
-notification_driver = noop
-verbose = True
-notification_driver = messagingv2
-rpc_backend = rabbit
+ops_edit_file $glancereg_ctl keystone_authtoken \
+auth_uri http://$CON_MGNT_IP:5000
 
-[database]
-connection = mysql+pymysql://glance:$GLANCE_DBPASS@$CON_MGNT_IP/glance
-backend = sqlalchemy
+ops_edit_file $glancereg_ctl keystone_authtoken \
+auth_url http://$CON_MGNT_IP:35357
 
-[glance_store]
-
-[keystone_authtoken]
-auth_uri = http://$CON_MGNT_IP:5000
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-project_name = service
-username = glance
-password = $GLANCE_PASS
+ops_edit_file $glancereg_ctl keystone_authtoken auth_plugin password
+ops_edit_file $glancereg_ctl keystone_authtoken project_domain_id default
+ops_edit_file $glancereg_ctl keystone_authtoken user_domain_id default
+ops_edit_file $glancereg_ctl keystone_authtoken project_name service
+ops_edit_file $glancereg_ctl keystone_authtoken username glance
+ops_edit_file $glancereg_ctl keystone_authtoken password $GLANCE_PASS
 
 
-[matchmaker_redis]
-[matchmaker_ring]
-[oslo_messaging_amqp]
-[oslo_messaging_qpid]
+ops_edit_file $glancereg_ctl paste_deploy flavor keystone
 
-[oslo_messaging_rabbit]
-rabbit_host = $CON_MGNT_IP
-rabbit_userid = openstack
-rabbit_password = $RABBIT_PASS
-[oslo_policy]
 
-[paste_deploy]
-flavor = keystone
+ops_edit_file $glancereg_ctl DEFAULT  notification_driver noop
+ops_edit_file $glancereg_ctl DEFAULT  verbose True
 
-EOF
 
 sleep 7
-echo "########## Remove Glance default DB ##########"
+echocolor "########## Remove Glance default DB ##########"
 rm /var/lib/glance/glance.sqlite
 
-chown glance:glance $fileglanceapicontrol
-chown glance:glance $fileglanceregcontrol
+chown glance:glance $glanceapi_ctl
+chown glance:glance $glancereg_ctl
 
 sleep 7
-echo "########## Syncing DB for Glance ##########"
+echocolor "########## Syncing DB for Glance ##########"
 glance-manage db_sync
 
 sleep 5
-echo "########## Restarting GLANCE service ... ##########"
+echocolor "########## Restarting GLANCE service ... ##########"
 service glance-registry restart
 service glance-api restart
 sleep 3
@@ -158,14 +121,14 @@ service glance-api restart
 
 #
 
-echo "Remove glance.sqlite "
+echocolor "Remove glance.sqlite "
 rm -f /var/lib/glance/glance.sqlite
 
 
 sleep 3
-echo "########## Registering Cirros IMAGE for GLANCE ... ##########"
+echocolor "########## Registering Cirros IMAGE for GLANCE ... ##########"
 mkdir images
-cd images/
+cd images /
 wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
 
 glance image-create --name "cirros" \
@@ -176,5 +139,5 @@ cd /root/
 # rm -r /tmp/images
 
 sleep 5
-echo "########## Testing Glance ##########"
+echocolor "########## Testing Glance ##########"
 glance image-list
