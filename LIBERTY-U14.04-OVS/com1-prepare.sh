@@ -139,34 +139,34 @@ sleep 5
 apt-get -y install neutron-plugin-ml2 neutron-plugin-openvswitch-agent
 
 echo "Config file neutron.conf"
-neutron_ctl=/etc/neutron/neutron.conf
-test -f $neutron_ctl.orig || cp $neutron_ctl $neutron_ctl.orig
+neutron_com=/etc/neutron/neutron.conf
+test -f $neutron_com.orig || cp $neutron_com $neutron_com.orig
 
 ## [DEFAULT] section
-ops_edit $neutron_ctl DEFAULT core_plugin ml2
-ops_edit $neutron_ctl DEFAULT rpc_backend rabbit
-ops_edit $neutron_ctl DEFAULT auth_strategy keystone
-ops_edit $neutron_ctl DEFAULT verbose True
-ops_edit $neutron_ctl DEFAULT allow_overlapping_ips True
-ops_edit $neutron_ctl DEFAULT service_plugins router
+ops_edit $neutron_com DEFAULT core_plugin ml2
+ops_edit $neutron_com DEFAULT rpc_backend rabbit
+ops_edit $neutron_com DEFAULT auth_strategy keystone
+ops_edit $neutron_com DEFAULT verbose True
+ops_edit $neutron_com DEFAULT allow_overlapping_ips True
+ops_edit $neutron_com DEFAULT service_plugins router
 
 ## [keystone_authtoken] section
-ops_edit $neutron_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
-ops_edit $neutron_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
-ops_edit $neutron_ctl keystone_authtoken auth_plugin password
-ops_edit $neutron_ctl keystone_authtoken project_domain_id default
-ops_edit $neutron_ctl keystone_authtoken user_domain_id default
-ops_edit $neutron_ctl keystone_authtoken project_name service
-ops_edit $neutron_ctl keystone_authtoken username neutron
-ops_edit $neutron_ctl keystone_authtoken password $KEYSTONE_PASS
+ops_edit $neutron_com keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
+ops_edit $neutron_com keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $neutron_com keystone_authtoken auth_plugin password
+ops_edit $neutron_com keystone_authtoken project_domain_id default
+ops_edit $neutron_com keystone_authtoken user_domain_id default
+ops_edit $neutron_com keystone_authtoken project_name service
+ops_edit $neutron_com keystone_authtoken username neutron
+ops_edit $neutron_com keystone_authtoken password $KEYSTONE_PASS
 
 ## [database] section 
-ops_del $neutron_ctl database connection
+ops_del $neutron_com database connection
 
 ## [oslo_messaging_rabbit] section
-ops_del $neutron_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
-ops_del $neutron_ctl oslo_messaging_rabbit rabbit_userid openstack
-ops_del $neutron_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+ops_del $neutron_com oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_del $neutron_com oslo_messaging_rabbit rabbit_userid openstack
+ops_del $neutron_com oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 
 echo "############ Configuring ml2_conf.ini ############"
@@ -176,26 +176,26 @@ ml2_com=/etc/neutron/plugins/ml2/ml2_conf.ini
 test -f $ml2_com.orig || cp $ml2_com $ml2_com.orig
 
 ## [ml2] section
-ops_edit $neutron_ctl ml2 type_drivers flat,vlan,gre,vxlan
-ops_edit $neutron_ctl ml2 tenant_network_types gre
-ops_edit $neutron_ctl ml2 mechanism_drivers openvswitch
+ops_edit $ml2_com ml2 type_drivers flat,vlan,gre,vxlan
+ops_edit $ml2_com ml2 tenant_network_types gre
+ops_edit $ml2_com ml2 mechanism_drivers openvswitch
 
 
 ## [ml2_type_gre] section
-ops_edit $neutron_ctl ml2_type_gre tunnel_id_ranges 1:1000
+ops_edit $ml2_com ml2_type_gre tunnel_id_ranges 1:1000
 
 ## [securitygroup] section 
-ops_edit $neutron_ctl securitygroup enable_security_group True
-ops_edit $neutron_ctl securitygroup enable_ipset True
-ops_edit $neutron_ctl securitygroup \
+ops_edit $ml2_com securitygroup enable_security_group True
+ops_edit $ml2_com securitygroup enable_ipset True
+ops_edit $ml2_com securitygroup \
 firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
 ## [ovs] section
-ops_edit $neutron_ctl ovs local_ip $COM1_MGNT_IP
-ops_edit $neutron_ctl ovs enable_tunneling True
+ops_edit $ml2_com ovs local_ip $COM1_MGNT_IP
+ops_edit $ml2_com ovs enable_tunneling True
 
 ## [agent] section
-ops_edit $neutron_ctl agent tunnel_types gre
+ops_edit $ml2_com agent tunnel_types gre
 
 
 echocolor "Reset service nova-compute,openvswitch-agent"
