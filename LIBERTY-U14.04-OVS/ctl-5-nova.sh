@@ -26,7 +26,7 @@ openstack endpoint create \
 compute
 
 
-echocolor "########## Install NOVA in $CON_MGNT_IP ##########"
+echocolor "Install NOVA in $CON_MGNT_IP"
 sleep 5 
 apt-get -y install nova-api nova-cert nova-conductor \
            nova-consoleauth nova-novncproxy nova-scheduler \
@@ -103,15 +103,15 @@ ops_edit $nova_ctl neutron metadata_proxy_shared_secret $METADATA_SECRET
 ops_edit $nova_ctl cinder os_region_name RegionOne
 
 
-echocolor "########## Remove Nova default db ##########"
+echocolor "Remove Nova default db "
 sleep 7
 rm /var/lib/nova/nova.sqlite
 
-echocolor "########## Syncing Nova DB ##########"
+echocolor "Syncing Nova DB"
 sleep 7 
 su -s /bin/sh -c "nova-manage db sync" nova
 
-echocolor "########## Restarting NOVA ... ##########"
+echocolor "Restarting NOVA "
 sleep 7 
 service nova-api restart
 service nova-cert restart
@@ -121,7 +121,7 @@ service nova-conductor restart
 service nova-novncproxy restart
 
 sleep 7 
-echocolor "########## Restarting NOVA ... ##########"
+echocolor "Restarting NOVA"
 service nova-api restart
 service nova-cert restart
 service nova-consoleauth restart
@@ -129,6 +129,6 @@ service nova-scheduler restart
 service nova-conductor restart
 service nova-novncproxy restart
 
-echocolor "########## Testing NOVA service ##########"
+echocolor "Testing NOVA service"
 nova-manage service list
 

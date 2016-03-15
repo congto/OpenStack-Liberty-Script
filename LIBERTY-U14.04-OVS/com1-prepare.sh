@@ -160,7 +160,10 @@ ops_edit $neutron_com keystone_authtoken project_name service
 ops_edit $neutron_com keystone_authtoken username neutron
 ops_edit $neutron_com keystone_authtoken password $KEYSTONE_PASS
 
-ops_del $neutron_com keystone_authtoken connection
+ops_del $neutron_com keystone_authtoken identity_uri
+ops_del $neutron_com keystone_authtoken admin_tenant_name
+ops_del $neutron_com keystone_authtoken admin_user
+ops_del $neutron_com keystone_authtoken admin_password
 
 
 

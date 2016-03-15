@@ -12,7 +12,7 @@ GRANT ALL PRIVILEGES ON keystone.* TO 'keystone'@'%' IDENTIFIED BY '$KEYSTONE_DB
 FLUSH PRIVILEGES;
 EOF
 
-echocolor "##### Install keystone #####"
+echocolor "Install keystone"
  
 echo "manual" > /etc/init/keystone.override
  
@@ -153,7 +153,7 @@ export OS_VOLUME_API_VERSION=2
 EOF
 
 sleep 5
-echocolor "########## Execute environment script ##########"
+echocolor "Execute environment script"
 chmod +x admin-openrc.sh
 cat  admin-openrc.sh >> /etc/profile
 cp  admin-openrc.sh /root/admin-openrc.sh
