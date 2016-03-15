@@ -4,6 +4,8 @@ source config.cfg
 source functions.sh
 
 echocolor "Create the database for GLANCE"
+sleep 3
+
 cat << EOF | mysql -uroot -p$MYSQL_PASS
 CREATE DATABASE glance;
 GRANT ALL PRIVILEGES ON glance.* TO 'glance'@'localhost' IDENTIFIED BY '$GLANCE_DBPASS';
@@ -12,8 +14,9 @@ FLUSH PRIVILEGES;
 EOF
 
 
-sleep 5
+
 echocolor " Create user, endpoint for GLANCE"
+sleep 3
 
 openstack user create --password $GLANCE_PASS glance
 openstack role add --project service --user glance admin
@@ -28,9 +31,11 @@ openstack endpoint create \
 --region RegionOne \
 image
 
-echocolor "########## Install GLANCE ##########"
+echocolor "Install GLANCE"
+sleep 5
 apt-get -y install glance python-glanceclient
-sleep 10
+
+
 echocolor "Configuring GLANCE API"
 sleep 5 
 #/* Back-up file nova.conf
@@ -98,22 +103,26 @@ ops_edit $glancereg_ctl DEFAULT  notification_driver noop
 ops_edit $glancereg_ctl DEFAULT  verbose True
 
 
-sleep 7
-echocolor "########## Remove Glance default DB ##########"
-rm /var/lib/glance/glance.sqlite
+# echocolor "########## Remove Glance default DB ##########"
+# sleep 7
+# rm /var/lib/glance/glance.sqlite
 
-chown glance:glance $glanceapi_ctl
-chown glance:glance $glancereg_ctl
+# chown glance:glance $glanceapi_ctl
+# chown glance:glance $glancereg_ctl
 
-sleep 7
+
 echocolor "########## Syncing DB for Glance ##########"
+sleep 7
 glance-manage db_sync
 
-sleep 5
+
 echocolor "########## Restarting GLANCE service ... ##########"
+sleep 5
+
 service glance-registry restart
 service glance-api restart
 sleep 3
+
 service glance-registry restart
 service glance-api restart
 
@@ -123,8 +132,10 @@ echocolor "Remove glance.sqlite "
 rm -f /var/lib/glance/glance.sqlite
 
 
-sleep 3
+
 echocolor "########## Registering Cirros IMAGE for GLANCE ... ##########"
+sleep 3
+
 mkdir images
 cd images /
 wget http://download.cirros-cloud.net/0.3.4/cirros-0.3.4-x86_64-disk.img
@@ -136,6 +147,7 @@ glance image-create --name "cirros" \
 cd /root/
 # rm -r /tmp/images
 
-sleep 5
+
 echocolor "########## Testing Glance ##########"
+sleep 5
 glance image-list

@@ -6,7 +6,7 @@
 source config.cfg
 source functions.sh
 
-echocolor "############ Configuring net forward for all VMs ############"
+echocolor "Configuring net forward for all VMs"
 sleep 5
 echo "net.ipv4.ip_forward=1" >> /etc/sysctl.conf
 echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
@@ -39,7 +39,7 @@ openstack endpoint create \
 # SERVICE_TENANT_ID=`keystone tenant-get service | awk '$2~/^id/{print $4}'`
 
 
-echocolor "########## Install NEUTRON node ################"
+echocolor "Install NEUTRON node"
 sleep 5
 apt-get -y install neutron-server python-neutronclient neutron-plugin-ml2 \
 neutron-plugin-openvswitch-agent neutron-l3-agent neutron-dhcp-agent \
@@ -48,7 +48,7 @@ neutron-metadata-agent neutron-plugin-openvswitch neutron-common
 
 
 ######## Backup configuration NEUTRON.CONF ##################"
-echocolor "########## Config NEUTRON ##########"
+echocolor "Config NEUTRON"
 sleep 5
 
 #
@@ -136,7 +136,7 @@ ops_edit $ml2_clt agent tunnel_types gre
 ops_edit $ml2_clt agent prevent_arp_spoofing True
 
 
-echocolor "############ Configuring L3 AGENT ############"
+echocolor "Configuring L3 AGENT"
 sleep 7 
 netl3agent=/etc/neutron/l3_agent.ini
 
@@ -149,7 +149,7 @@ ops_edit $netl3agent DEFAULT router_delete_namespaces True
 ops_edit $netl3agent DEFAULT verbose True
 
 
-echocolor "############  Configuring DHCP AGENT ############ "
+echocolor "Configuring DHCP AGENT"
 sleep 7 
 #
 netdhcp=/etc/neutron/dhcp_agent.ini
@@ -163,12 +163,12 @@ ops_edit $netdhcp DEFAULT verbose True
 ops_edit $netdhcp DEFAULT dnsmasq_config_file /etc/neutron/dnsmasq-neutron.conf
 
 
-echocolor "############ Fix loi MTU ############"
+echocolor "Fix loi MTU"
 sleep 3
 echo "dhcp-option-force=26,1454" > /etc/neutron/dnsmasq-neutron.conf
 killall dnsmasq
 
-echocolor "############  Configuring METADATA AGENT ############"
+echocolor "Configuring METADATA AGENT"
 sleep 7 
 netmetadata=/etc/neutron/metadata_agent.ini
 
@@ -197,13 +197,13 @@ ops_del $netmetadata DEFAULT admin_password
 su -s /bin/sh -c "neutron-db-manage --config-file /etc/neutron/neutron.conf \
   --config-file /etc/neutron/plugins/ml2/ml2_conf.ini upgrade head" neutron
   
-echocolor "########## Restarting NOVA service ##########"
+echocolor "Restarting NOVA service"
 sleep 7 
 service nova-api restart
 service nova-scheduler restart
 service nova-conductor restart
 
-echocolor "########## Restarting NEUTRON service ##########"
+echocolor "Restarting NEUTRON service"
 sleep 7 
 service neutron-server restart
 service neutron-plugin-openvswitch-agent restart
@@ -213,11 +213,11 @@ service neutron-l3-agent restart
 
 rm -f /var/lib/neutron/neutron.sqlite
 
-echocolor "########## check service Neutron ##########"
+echocolor "Check service Neutron"
 neutron agent-list
 sleep 5
 
-echocolor "########## Config IP address for br-ex ##########"
+echocolor "Config IP address for br-ex"
 
 ifaces=/etc/network/interfaces
 test -f $ifaces.orig1 || cp $ifaces $ifaces.orig1
@@ -255,5 +255,5 @@ ovs-vsctl add-br br-ex
 ovs-vsctl add-port br-ex eth1
 
 sleep 5
-echocolor "##### Reboot SERVER #####"
+echocolor "Reboot SERVER"
 init 6

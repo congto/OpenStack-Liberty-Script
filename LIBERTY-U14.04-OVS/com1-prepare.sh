@@ -9,11 +9,12 @@ pip install https://pypi.python.org/packages/source/c/crudini/crudini-0.7.tar.gz
 
 #
 
-echo "net.ipv4.conf.all.rp_filter=0" >> /etc/sysctl.conf
-echo "net.ipv4.conf.default.rp_filter=0" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-iptables=1" >> /etc/sysctl.conf
-echo "net.bridge.bridge-nf-call-ip6tables=1" >> /etc/sysctl.conf
-
+cat << EOF >> /etc/sysctl.conf
+net.ipv4.conf.all.rp_filter=0
+net.ipv4.conf.default.rp_filter=0
+net.bridge.bridge-nf-call-iptables=1
+net.bridge.bridge-nf-call-ip6tables=1
+EOF
 
 echocolor "Install python openstack client"
 apt-get -y install python-openstackclient
@@ -46,7 +47,8 @@ sed -i "s/server ntp.ubuntu.com/server $CON_MGNT_IP iburst/g" /etc/ntp.conf
 sleep 5
 echocolor "Installl package for NOVA"
 apt-get -y install nova-compute 
-echo "libguestfs-tools        libguestfs/update-appliance     boolean true"  | debconf-set-selections
+echo "libguestfs-tools libguestfs/update-appliance boolean true" \
+	| debconf-set-selections
 apt-get -y install libguestfs-tools sysfsutils guestfsd python-guestfs
 
 #fix loi chen pass tren hypervisor la KVM
@@ -54,179 +56,146 @@ update-guestfs-appliance
 chmod 0644 /boot/vmlinuz*
 usermod -a -G kvm root
 
+
 echocolor "Configuring in nova.conf"
 sleep 5
 ########
 #/* Sao luu truoc khi sua file nova.conf
-filenova=/etc/nova/nova.conf
-test -f $filenova.orig || cp $filenova $filenova.orig
+nova_com=/etc/nova/nova.conf
+test -f $nova_com.orig || cp $nova_com $nova_com.orig
 
-#Chen noi dung file /etc/nova/nova.conf vao 
-cat << EOF > $filenova
-[DEFAULT]
-dhcpbridge_flagfile=/etc/nova/nova.conf
-dhcpbridge=/usr/bin/nova-dhcpbridge
-logdir=/var/log/nova
-state_path=/var/lib/nova
-lock_path=/var/lock/nova
-force_dhcp_release=True
-libvirt_use_virtio_for_bridges=True
-verbose=True
-ec2_private_dns_show_ip=True
-api_paste_config=/etc/nova/api-paste.ini
-enabled_apis=ec2,osapi_compute,metadata
+## [DEFAULT] Section
+ops_edit $nova_com DEFAULT rpc_backend rabbit
+ops_edit $nova_com DEFAULT auth_strategy keystone
+ops_edit $nova_com DEFAULT my_ip $COM1_MGNT_IP
+ops_edit $nova_com DEFAULT network_api_class nova.network.neutronv2.api.API
+ops_edit $nova_com DEFAULT security_group_api neutron
+ops_edit $nova_com DEFAULT \
+	linuxnet_interface_driver nova.network.linux_net.LinuxOVSInterfaceDriver
+ops_edit $nova_com DEFAULT \
+	firewall_driver nova.virt.firewall.NoopFirewallDriver
 
-rpc_backend = rabbit
-auth_strategy = keystone
-my_ip = $COM1_MGNT_IP
+ops_edit $nova_com DEFAULT enable_instance_password True
 
-network_api_class = nova.network.neutronv2.api.API
-security_group_api = neutron
-linuxnet_interface_driver = nova.network.linux_net.LinuxOVSInterfaceDriver
-firewall_driver = nova.virt.firewall.NoopFirewallDriver
+## [oslo_messaging_rabbit] section
+ops_edit $nova_com oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit $nova_com oslo_messaging_rabbit rabbit_userid openstack
+ops_edit $nova_com oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 
-enable_instance_password = True
+## [keystone_authtoken] section
+ops_edit $nova_com keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
+ops_edit $nova_com keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $nova_com keystone_authtoken auth_plugin password
+ops_edit $nova_com keystone_authtoken project_domain_id default
+ops_edit $nova_com keystone_authtoken user_domain_id default
+ops_edit $nova_com keystone_authtoken project_name service
+ops_edit $nova_com keystone_authtoken username nova
+ops_edit $nova_com keystone_authtoken password $KEYSTONE_PASS
 
-[oslo_messaging_rabbit]
-rabbit_host = $CON_MGNT_IP
-rabbit_userid = openstack
-rabbit_password = $RABBIT_PASS
+## [vnc] section
+ops_edit $nova_com vnc enabled True
+ops_edit $nova_com vnc vncserver_listen 0.0.0.0
+ops_edit $nova_com vnc vncserver_proxyclient_address \$my_ip
+ops_edit $nova_com vnc vncserver_proxyclient_address \$my_ip
+ops_edit $nova_com vnc \
+	novncproxy_base_url http://$CON_EXT_IP:6080/vnc_auto.html
+	
+	
+## [glance] section
+ops_edit $nova_com glance host $CON_MGNT_IP
 
-[keystone_authtoken]
-auth_uri = http://$CON_MGNT_IP:5000
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-project_name = service
-username = nova
-password = $KEYSTONE_PASS
 
-[vnc]
-enabled = True
-vncserver_listen = 0.0.0.0
-vncserver_proxyclient_address = \$my_ip
-novncproxy_base_url = http://$CON_EXT_IP:6080/vnc_auto.html
+## [oslo_concurrency] section
+ops_edit $nova_com oslo_concurrency lock_path /var/lib/nova/tmp
 
-[glance]
-host = $CON_MGNT_IP
+## [neutron] section
+ops_edit $nova_com neutron url http://$CON_MGNT_IP:9696
+ops_edit $nova_com neutron auth_url http://$CON_MGNT_IP:35357
+ops_edit $nova_com neutron auth_plugin password
+ops_edit $nova_com neutron project_domain_id default
+ops_edit $nova_com neutron user_domain_id default
+ops_edit $nova_com neutron region_name RegionOne
+ops_edit $nova_com neutron project_name service
+ops_edit $nova_com neutron username neutron
+ops_edit $nova_com neutron password $NEUTRON_PASS
 
-[oslo_concurrency]
-lock_path = /var/lib/nova/tmp
+## [libvirt] section
+ops_edit $nova_com libvirt inject_key True
+ops_edit $nova_com libvirt inject_partition -1
+ops_edit $nova_com libvirt inject_password True
 
-[neutron]
-url = http://$CON_MGNT_IP:9696
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-region_name = RegionOne
-project_name = service
-username = neutron
-password = $NEUTRON_PASS
 
-[libvirt]
-inject_key = True
-inject_partition = -1
-inject_password = True
-
-EOF
-
-echo "##### Restart nova-compute #####"
+echo "Restart nova-compute"
 sleep 5
 service nova-compute restart
 
 # Remove default nova db
 rm /var/lib/nova/nova.sqlite
 
-echo "##### Install openvswitch-agent (neutron) on COMPUTE NODE #####"
-sleep 10
+echo "Install openvswitch-agent (neutron) on COMPUTE NODE"
+sleep 5
 
 apt-get -y install neutron-plugin-ml2 neutron-plugin-openvswitch-agent
 
 echo "Config file neutron.conf"
-controlneutron=/etc/neutron/neutron.conf
-test -f $controlneutron.orig || cp $controlneutron $controlneutron.orig
-rm $controlneutron
-touch $controlneutron
-cat << EOF >> $controlneutron
-[DEFAULT]
-core_plugin = ml2
+neutron_ctl=/etc/neutron/neutron.conf
+test -f $neutron_ctl.orig || cp $neutron_ctl $neutron_ctl.orig
 
-rpc_backend = rabbit
-auth_strategy = keystone
-verbose = True
-allow_overlapping_ips = True
-service_plugins = router
+## [DEFAULT] section
+ops_edit $neutron_ctl DEFAULT core_plugin ml2
+ops_edit $neutron_ctl DEFAULT rpc_backend rabbit
+ops_edit $neutron_ctl DEFAULT auth_strategy keystone
+ops_edit $neutron_ctl DEFAULT verbose True
+ops_edit $neutron_ctl DEFAULT allow_overlapping_ips True
+ops_edit $neutron_ctl DEFAULT service_plugins router
 
-[matchmaker_redis]
-[matchmaker_ring]
-[quotas]
-[agent]
-root_helper = sudo /usr/bin/neutron-rootwrap /etc/neutron/rootwrap.conf
+## [keystone_authtoken] section
+ops_edit $neutron_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
+ops_edit $neutron_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
+ops_edit $neutron_ctl keystone_authtoken auth_plugin password
+ops_edit $neutron_ctl keystone_authtoken project_domain_id default
+ops_edit $neutron_ctl keystone_authtoken user_domain_id default
+ops_edit $neutron_ctl keystone_authtoken project_name service
+ops_edit $neutron_ctl keystone_authtoken username neutron
+ops_edit $neutron_ctl keystone_authtoken password $KEYSTONE_PASS
 
-[keystone_authtoken]
-auth_uri = http://$CON_MGNT_IP:5000
-auth_url = http://$CON_MGNT_IP:35357
-auth_plugin = password
-project_domain_id = default
-user_domain_id = default
-project_name = service
-username = neutron
-password = $KEYSTONE_PASS
+## [database] section 
+ops_del $neutron_ctl database connection
 
-[database]
-# connection = sqlite:////var/lib/neutron/neutron.sqlite
+## [oslo_messaging_rabbit] section
+ops_del $neutron_ctl oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_del $neutron_ctl oslo_messaging_rabbit rabbit_userid openstack
+ops_del $neutron_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
-[nova]
-[oslo_concurrency]
-lock_path = \$state_path/lock
-[oslo_policy]
-[oslo_messaging_amqp]
-[oslo_messaging_qpid]
-
-[oslo_messaging_rabbit]
-rabbit_host = $CON_MGNT_IP
-rabbit_userid = openstack
-rabbit_password = $RABBIT_PASS
-
-[qos]
-EOF
 
 echo "############ Configuring ml2_conf.ini ############"
 sleep 5
 ########
-comfileml2=/etc/neutron/plugins/ml2/ml2_conf.ini
-test -f $comfileml2.orig || cp $comfileml2 $comfileml2.orig
-rm $comfileml2
-touch $comfileml2
-#Update ML2 config file /etc/neutron/plugins/ml2/ml2_conf.ini
-cat << EOF > $comfileml2
-[ml2]
-type_drivers = flat,vlan,gre,vxlan
-tenant_network_types = gre
-mechanism_drivers = openvswitch
+ml2_com=/etc/neutron/plugins/ml2/ml2_conf.ini
+test -f $ml2_com.orig || cp $ml2_com $ml2_com.orig
 
-[ml2_type_flat]
-[ml2_type_vlan]
-[ml2_type_gre]
-tunnel_id_ranges = 1:1000
+## [ml2] section
+ops_edit $neutron_ctl ml2 type_drivers flat,vlan,gre,vxlan
+ops_edit $neutron_ctl ml2 tenant_network_types gre
+ops_edit $neutron_ctl ml2 mechanism_drivers openvswitch
 
-[ml2_type_vxlan]
-[securitygroup]
-enable_security_group = True
-enable_ipset = True
-firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
-[ovs]
-local_ip = $COM1_MGNT_IP
-enable_tunneling = True
+## [ml2_type_gre] section
+ops_edit $neutron_ctl ml2_type_gre tunnel_id_ranges 1:1000
 
-[agent]
-tunnel_types = gre
+## [securitygroup] section 
+ops_edit $neutron_ctl securitygroup enable_security_group True
+ops_edit $neutron_ctl securitygroup enable_ipset True
+ops_edit $neutron_ctl securitygroup \
+firewall_driver neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
-EOF
+## [ovs] section
+ops_edit $neutron_ctl ovs local_ip $COM1_MGNT_IP
+ops_edit $neutron_ctl ovs enable_tunneling True
+
+## [agent] section
+ops_edit $neutron_ctl agent tunnel_types gre
 
 
 echocolor "Reset service nova-compute,openvswitch-agent"
