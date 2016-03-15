@@ -56,7 +56,6 @@ ops_edit $glanceapi_ctl keystone_authtoken project_name service
 ops_edit $glanceapi_ctl keystone_authtoken username glance
 ops_edit $glanceapi_ctl keystone_authtoken password $GLANCE_PASS
 
-
 ops_edit $glanceapi_ctl paste_deploy flavor keystone
 
 ops_edit $glanceapi_ctl glance_store default_store file

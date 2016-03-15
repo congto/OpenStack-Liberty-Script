@@ -94,7 +94,8 @@ Listen 35357
  
 EOF
  
-ln -s /etc/apache2/sites-available/wsgi-keystone.conf /etc/apache2/sites-enabled
+ln -s /etc/apache2/sites-available/wsgi-keystone.conf \
+	/etc/apache2/sites-enabled
  
 service apache2 restart
 
@@ -103,10 +104,6 @@ rm -f /var/lib/keystone/keystone.db
 export OS_TOKEN="$TOKEN_PASS"
 export OS_URL=http://$CON_MGNT_IP:35357/v2.0
  
- 
-# export OS_SERVICE_TOKEN="$TOKEN_PASS"
-# export OS_SERVICE_ENDPOINT="http://$CON_MGNT_IP:35357/v2.0"
-# export SERVICE_ENDPOINT="http://$CON_MGNT_IP:35357/v2.0"
  
 ###  Identity service
 openstack service create \
