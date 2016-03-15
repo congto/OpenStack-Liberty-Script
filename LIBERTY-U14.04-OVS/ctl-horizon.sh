@@ -2,12 +2,12 @@
 
 source config.cfg
 
-###################
-echo "########## START INSTALLING OPS DASHBOARD ##########"
+
+echocolor "START INSTALLING OPS DASHBOARD"
 ###################
 sleep 5
 
-echo "########## Installing Dashboard package ##########"
+echocolor "Installing Dashboard package"
 apt-get -y install openstack-dashboard 
 apt-get -y remove --auto-remove openstack-dashboard-ubuntu-theme
 
@@ -17,7 +17,7 @@ apt-get -y remove --auto-remove openstack-dashboard-ubuntu-theme
 # echo "ServerName localhost" > /etc/apache2/conf-available/servername.conf
 # sudo a2enconf servername 
 
-echo "########## Creating redirect page ##########"
+echocolor "Creating redirect page"
 
 filehtml=/var/www/html/index.html
 test -f $filehtml.orig || cp $filehtml $filehtml.orig
@@ -34,14 +34,18 @@ cat << EOF >> $filehtml
 </html>
 EOF
 # Allowing insert password in dashboard ( only apply in image )
-sed -i "s/'can_set_password': False/'can_set_password': True/g" /etc/openstack-dashboard/local_settings.py
+sed -i "s/'can_set_password': False/'can_set_password': True/g" \
+/etc/openstack-dashboard/local_settings.py
+
+sed -i "s/_member_/user/g" /etc/openstack-dashboard/local_settings.py 
+
 
 ## /* Restarting apache2 and memcached
 service apache2 restart
 service memcached restart
-echo "########## Finish setting up Horizon ##########"
+echocolor "Finish setting up Horizon"
 
-echo "########## LOGIN INFORMATION IN HORIZON ##########"
-echo "URL: http://$CON_EXT_IP/horizon"
-echo "User: admin or demo"
-echo "Password:" $ADMIN_PASS
+echocolor "LOGIN INFORMATION IN HORIZON"
+echocolor "URL: http://$CON_EXT_IP/horizon"
+echocolor "User: admin or demo"
+echocolor "Password:" $ADMIN_PASS

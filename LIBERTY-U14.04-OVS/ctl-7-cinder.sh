@@ -61,7 +61,7 @@ ops_edit $cinder_ctl DEFAULT glance_host $CON_MGNT_IP
 ops_edit $cinder_ctl DEFAULT notification_driver messagingv2
 
 ## [database] section
-ops_edit $cinder_ctl \
+ops_edit $cinder_ctl database \
 connection mysql+pymysql://cinder:$CINDER_DBPASS@$CON_MGNT_IP/cinder
 
 ## [oslo_messaging_rabbit] section

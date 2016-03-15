@@ -36,7 +36,7 @@ ceilometer-agent-central ceilometer-agent-notification \
 ceilometer-alarm-evaluator ceilometer-alarm-notifier \
 python-ceilometerclient
 
-echo "Config ceilometer"
+echocolor "Config ceilometer"
 sleep 5
 
 ceilometer_ctl=/etc/ceilometer/ceilometer.conf
@@ -79,7 +79,7 @@ ops_edit $ceilometer_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 EOF
 
-echo "Restart service"
+echocolor "Restart service"
 sleep 3
 service ceilometer-agent-central restart
 service ceilometer-agent-notification restart
