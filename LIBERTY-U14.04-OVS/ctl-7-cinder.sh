@@ -70,7 +70,7 @@ ops_edit $cinder_ctl oslo_messaging_rabbit rabbit_userid openstack
 ops_edit $cinder_ctl oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 ## [keystone_authtoken] section
-ops_edit $cinder_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:50000
+ops_edit $cinder_ctl keystone_authtoken auth_uri http://$CON_MGNT_IP:5000
 ops_edit $cinder_ctl keystone_authtoken auth_url http://$CON_MGNT_IP:35357
 ops_edit $cinder_ctl keystone_authtoken auth_plugin password
 ops_edit $cinder_ctl keystone_authtoken project_domain_id default
