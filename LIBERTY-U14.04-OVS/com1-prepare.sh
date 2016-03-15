@@ -160,13 +160,17 @@ ops_edit $neutron_com keystone_authtoken project_name service
 ops_edit $neutron_com keystone_authtoken username neutron
 ops_edit $neutron_com keystone_authtoken password $KEYSTONE_PASS
 
+ops_del $neutron_com keystone_authtoken connection
+
+
+
 ## [database] section 
 ops_del $neutron_com database connection
 
 ## [oslo_messaging_rabbit] section
-ops_del $neutron_com oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
-ops_del $neutron_com oslo_messaging_rabbit rabbit_userid openstack
-ops_del $neutron_com oslo_messaging_rabbit rabbit_password $RABBIT_PASS
+ops_edit $neutron_com oslo_messaging_rabbit rabbit_host $CON_MGNT_IP
+ops_edit $neutron_com oslo_messaging_rabbit rabbit_userid openstack
+ops_edit $neutron_com oslo_messaging_rabbit rabbit_password $RABBIT_PASS
 
 
 echo "############ Configuring ml2_conf.ini ############"
